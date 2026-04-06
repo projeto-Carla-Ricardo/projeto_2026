@@ -1,0 +1,31 @@
+[
+  {"codigo": "D1", "dimensao_codigo": "DADOS", "nome": "Recolha de Dados", "descricao": "Existência de processos sistemáticos de recolha de dados (vendas, clientes, operações)", "ordem": 1},
+  {"codigo": "D2", "dimensao_codigo": "DADOS", "nome": "Armazenamento Digital", "descricao": "Grau de digitalização do armazenamento (papel vs. digital vs. cloud)", "ordem": 2},
+  {"codigo": "D3", "dimensao_codigo": "DADOS", "nome": "Qualidade e Organização", "descricao": "Dados estruturados, limpos e acessíveis vs. dispersos e inconsistentes", "ordem": 3},
+  {"codigo": "D4", "dimensao_codigo": "DADOS", "nome": "Utilização para Decisão", "descricao": "Dados são efetivamente usados para tomar decisões de negócio", "ordem": 4},
+  {"codigo": "D5", "dimensao_codigo": "DADOS", "nome": "Segurança e Privacidade", "descricao": "Existência de práticas de proteção e backup de dados", "ordem": 5},
+
+  {"codigo": "I1", "dimensao_codigo": "INFRA", "nome": "Hardware e Dispositivos", "descricao": "Computadores, tablets, smartphones disponíveis para operação", "ordem": 1},
+  {"codigo": "I2", "dimensao_codigo": "INFRA", "nome": "Software e Ferramentas", "descricao": "Utilização de software de gestão, produtividade, comunicação", "ordem": 2},
+  {"codigo": "I3", "dimensao_codigo": "INFRA", "nome": "Conectividade", "descricao": "Qualidade e fiabilidade da ligação à internet", "ordem": 3},
+  {"codigo": "I4", "dimensao_codigo": "INFRA", "nome": "Presença Digital", "descricao": "Website, redes sociais, Google Business, plataformas de e-commerce", "ordem": 4},
+  {"codigo": "I5", "dimensao_codigo": "INFRA", "nome": "Integração de Sistemas", "descricao": "Ferramentas comunicam entre si ou funcionam isoladamente", "ordem": 5},
+
+  {"codigo": "C1", "dimensao_codigo": "COMP", "nome": "Literacia Digital Básica", "descricao": "Colaboradores sabem usar computador, email, internet com confiança", "ordem": 1},
+  {"codigo": "C2", "dimensao_codigo": "COMP", "nome": "Competências em Ferramentas", "descricao": "Capacidade de usar software de produtividade e gestão", "ordem": 2},
+  {"codigo": "C3", "dimensao_codigo": "COMP", "nome": "Abertura à Aprendizagem", "descricao": "Disposição para aprender novas ferramentas e tecnologias", "ordem": 3},
+  {"codigo": "C4", "dimensao_codigo": "COMP", "nome": "Conhecimento de IA", "descricao": "Noção básica do que é IA e onde pode ser aplicada", "ordem": 4},
+  {"codigo": "C5", "dimensao_codigo": "COMP", "nome": "Formação e Desenvolvimento", "descricao": "Existência de práticas de formação contínua na organização", "ordem": 5},
+
+  {"codigo": "E1", "dimensao_codigo": "ESTR", "nome": "Visão Digital", "descricao": "Existe um plano ou visão para a digitalização do negócio", "ordem": 1},
+  {"codigo": "E2", "dimensao_codigo": "ESTR", "nome": "Investimento em Tecnologia", "descricao": "Há orçamento dedicado a tecnologia e inovação", "ordem": 2},
+  {"codigo": "E3", "dimensao_codigo": "ESTR", "nome": "Identificação de Oportunidades", "descricao": "A empresa identifica onde a tecnologia pode melhorar processos", "ordem": 3},
+  {"codigo": "E4", "dimensao_codigo": "ESTR", "nome": "Planeamento de IA", "descricao": "Existem planos concretos ou interesse em adotar IA", "ordem": 4},
+  {"codigo": "E5", "dimensao_codigo": "ESTR", "nome": "Alinhamento com Objetivos", "descricao": "A tecnologia está alinhada com os objetivos de negócio", "ordem": 5},
+
+  {"codigo": "CU1", "dimensao_codigo": "CULT", "nome": "Abertura à Mudança", "descricao": "A organização aceita e promove mudanças nos processos", "ordem": 1},
+  {"codigo": "CU2", "dimensao_codigo": "CULT", "nome": "Cultura de Inovação", "descricao": "Há incentivo à experimentação e novas ideias", "ordem": 2},
+  {"codigo": "CU3", "dimensao_codigo": "CULT", "nome": "Liderança Tecnológica", "descricao": "A gestão/liderança promove ativamente a adoção tecnológica", "ordem": 3},
+  {"codigo": "CU4", "dimensao_codigo": "CULT", "nome": "Colaboração", "descricao": "Existem práticas de partilha de conhecimento e trabalho colaborativo", "ordem": 4},
+  {"codigo": "CU5", "dimensao_codigo": "CULT", "nome": "Resiliência", "descricao": "Capacidade de lidar com falhas e aprender com erros na adoção tecnológica", "ordem": 5}
+]

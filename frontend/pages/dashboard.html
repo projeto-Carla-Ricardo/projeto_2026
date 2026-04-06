@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard IALO - Painel de controlo de diagnósticos de maturidade digital">
+    <title>Dashboard — IALO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <script>
+        (function() {
+            var currentTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+        })();
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar__logo">
+            <span class="logo-icon">🧠</span>
+            <span class="logo-text">IALO</span>
+        </div>
+        <nav class="sidebar__nav">
+            <a href="#" class="sidebar__link sidebar__link--active" data-section="overview">
+                <span class="sidebar__icon">📊</span> Visão Geral
+            </a>
+            <a href="#" class="sidebar__link" data-section="empresas">
+                <span class="sidebar__icon">🏢</span> Empresas
+            </a>
+            <a href="#" class="sidebar__link" data-section="avaliacoes">
+                <span class="sidebar__icon">📝</span> Diagnósticos
+            </a>
+            <a href="#" class="sidebar__link" data-section="settings">
+                <span class="sidebar__icon">⚙️</span> Definições
+            </a>
+        </nav>
+        <div class="sidebar__user">
+            <div class="sidebar__avatar" id="user-avatar">U</div>
+            <div class="sidebar__user-info">
+                <span class="sidebar__username" id="user-name">Utilizador</span>
+                <a href="#" id="btn-logout" class="sidebar__logout">Sair</a>
+            </div>
+            <button id="theme-toggle" class="btn btn--ghost sidebar__theme" style="margin-left: auto; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent;">🌙</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- Overview Section -->
+        <section class="content-section active" id="section-overview">
+            <div class="content-header">
+                <h1>Visão Geral</h1>
+                <p class="content-subtitle">Resumo dos seus diagnósticos IALO</p>
+            </div>
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card__icon">🏢</div>
+                    <div class="stat-card__value" id="stat-empresas">0</div>
+                    <div class="stat-card__label">Empresas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">📝</div>
+                    <div class="stat-card__value" id="stat-avaliacoes">0</div>
+                    <div class="stat-card__label">Diagnósticos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">✅</div>
+                    <div class="stat-card__value" id="stat-concluidas">0</div>
+                    <div class="stat-card__label">Concluídos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">🎯</div>
+                    <div class="stat-card__value" id="stat-media">—</div>
+                    <div class="stat-card__label">Pontuação Média</div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2>Ações Rápidas</h2>
+                <div class="actions-grid">
+                    <button class="action-card" id="btn-nova-empresa">
+                        <span class="action-card__icon">➕</span>
+                        <span class="action-card__text">Nova Empresa</span>
+                    </button>
+                    <button class="action-card" id="btn-novo-diagnostico">
+                        <span class="action-card__icon">🔍</span>
+                        <span class="action-card__text">Novo Diagnóstico</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <h2>Últimos Diagnósticos</h2>
+                <div id="recent-avaliacoes" class="recent-list">
+                    <p class="empty-state">Nenhum diagnóstico realizado ainda.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Empresas Section -->
+        <section class="content-section" id="section-empresas">
+            <div class="content-header">
+                <h1>Empresas</h1>
+                <button class="btn btn--primary" id="btn-add-empresa">➕ Nova Empresa</button>
+            </div>
+            <div id="empresas-list" class="cards-grid">
+                <p class="empty-state">Nenhuma empresa registada.</p>
+            </div>
+        </section>
+
+        <!-- Avaliações Section -->
+        <section class="content-section" id="section-avaliacoes">
+            <div class="content-header">
+                <h1>Diagnósticos</h1>
+            </div>
+            <div id="avaliacoes-list" class="cards-grid">
+                <p class="empty-state">Nenhum diagnóstico realizado.</p>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="content-section" id="section-settings">
+            <div class="content-header">
+                <h1>Definições</h1>
+                <p class="content-subtitle">Configuração do Assistente IA</p>
+            </div>
+            <div class="settings-card">
+                <h2>🤖 API Gemini (Google AI)</h2>
+                <p class="settings-desc">Configure a ligação ao modelo de IA que gera recomendações e guia o questionário.</p>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="gemini-api-key" class="form-label">API Key</label>
+                        <div class="input-with-button">
+                            <input type="password" id="gemini-api-key" class="form-input" placeholder="Cole aqui a sua API Key do Gemini">
+                            <button type="button" id="btn-toggle-key" class="btn btn--ghost btn--sm">👁️</button>
+                        </div>
+                        <small class="form-hint">Obtenha em <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="gemini-model" class="form-label">Modelo</label>
+                        <select id="gemini-model" class="form-input form-select">
+                            <option value="">A carregar...</option>
+                        </select>
+                    </div>
+                    <div class="settings-actions">
+                        <button id="btn-test-ai" class="btn btn--ghost">🔌 Testar Conexão</button>
+                        <button id="btn-save-ai" class="btn btn--primary">💾 Guardar</button>
+                        <button id="btn-clear-key" class="btn btn--danger">🗑️ Apagar Key</button>
+                    </div>
+                    <div id="ai-status" class="ai-status" style="display:none"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Nova Empresa -->
+    <div class="modal-overlay" id="modal-empresa" style="display:none">
+        <div class="modal">
+            <div class="modal__header">
+                <h2>Nova Empresa</h2>
+                <button class="modal__close" data-close-modal>&times;</button>
+            </div>
+            <form id="form-empresa" class="modal__body">
+                <div class="form-group">
+                    <label for="emp-nome" class="form-label">Nome da empresa *</label>
+                    <input type="text" id="emp-nome" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="emp-setor" class="form-label">Setor *</label>
+                        <select id="emp-setor" class="form-input form-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Alimentar">Alimentar</option>
+                            <option value="Comércio">Comércio</option>
+                            <option value="Construção">Construção</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Hotelaria">Hotelaria / Turismo</option>
+                            <option value="Indústria">Indústria</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Serviços">Serviços</option>
+                            <option value="Tecnologia">Tecnologia</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-colaboradores" class="form-label">Nº Colaboradores</label>
+                        <input type="number" id="emp-colaboradores" class="form-input" min="1" max="250">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="emp-localizacao" class="form-label">Localização</label>
+                    <input type="text" id="emp-localizacao" class="form-input" placeholder="Ex: Lisboa, Porto, Coimbra...">
+                </div>
+                <div class="form-group">
+                    <label for="emp-descricao" class="form-label">Descrição</label>
+                    <textarea id="emp-descricao" class="form-input form-textarea" rows="3" placeholder="Breve descrição da atividade..."></textarea>
+                </div>
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+                    <button type="submit" class="btn btn--primary">Criar Empresa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/theme.js"></script>
+</body>
+</html>

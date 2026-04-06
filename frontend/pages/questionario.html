@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Questionário IALO - Diagnóstico de Maturidade Digital Interativo">
+    <title>Questionário — IALO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/questionario.css">
+    <script>
+        (function() {
+            var currentTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+        })();
+    </script>
+</head>
+<body>
+    <div class="quiz-layout">
+        <!-- Left: Questionnaire -->
+        <div class="quiz-panel">
+            <!-- Header -->
+            <div class="quiz-header">
+                <a href="dashboard.html" class="quiz-back">← Dashboard</a>
+                <button id="theme-toggle" class="btn btn--ghost" style="margin: 0 1rem; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent;">🌙</button>
+                <div class="quiz-progress">
+                    <div class="quiz-progress__bar">
+                        <div class="quiz-progress__fill" id="progress-fill" style="width:0%"></div>
+                    </div>
+                    <span class="quiz-progress__text" id="progress-text">0%</span>
+                </div>
+            </div>
+
+            <!-- Dimension Tabs -->
+            <div class="quiz-dimensions" id="quiz-dimensions">
+                <!-- Filled by JS -->
+            </div>
+
+            <!-- Question Area -->
+            <div class="quiz-body" id="quiz-body">
+                <div class="quiz-loading">
+                    <div class="spinner"></div>
+                    <p>A carregar questionário...</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="quiz-footer">
+                <button id="btn-prev" class="btn btn--ghost" disabled>← Anterior</button>
+                <button id="btn-save" class="btn btn--ghost">💾 Guardar Progresso</button>
+                <button id="btn-next" class="btn btn--primary">Seguinte →</button>
+                <button id="btn-finish" class="btn btn--primary" style="display:none">✅ Concluir Diagnóstico</button>
+            </div>
+        </div>
+
+        <!-- Right: AI Assistant -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div class="chat-header__info">
+                    <span class="chat-avatar">🤖</span>
+                    <div>
+                        <h3 class="chat-header__title">Assistente IALO</h3>
+                        <span class="chat-header__status" id="chat-status">Online</span>
+                    </div>
+                </div>
+                <button id="btn-toggle-chat" class="btn btn--ghost btn--sm chat-toggle">💬</button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-message chat-message--assistant">
+                    <div class="chat-message__avatar">🤖</div>
+                    <div class="chat-message__bubble">
+                        <p>Olá! 👋 Sou o Assistente IALO. Estou aqui para ajudá-lo durante o questionário. Se tiver dúvidas sobre qualquer pergunta, é só perguntar!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chat-input-field" class="form-input" placeholder="Escreva a sua dúvida...">
+                <button id="btn-send-chat" class="btn btn--primary btn--sm">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/questionario.js"></script>
+    <script src="../js/theme.js"></script>
+</body>
+</html>

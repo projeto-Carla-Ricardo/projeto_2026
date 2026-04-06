@@ -1,0 +1,227 @@
+[
+  {
+    "indicador_codigo": "D1",
+    "texto": "Como regista as vendas e transações da sua empresa?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Caderno/papel", "Excel/folha de cálculo", "Software dedicado (faturação)", "ERP integrado"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Pense no método que usa no dia-a-dia para registar cada venda ou serviço prestado. Desde o registo mais simples (anotar à mão) até sistemas automatizados."
+  },
+  {
+    "indicador_codigo": "D2",
+    "texto": "Onde estão guardados os dados dos seus clientes?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Não tenho registo de clientes", "Em papel/agenda", "Ficheiro no computador (Excel, etc.)", "Sistema na nuvem (CRM, Google, etc.)"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Considere onde guarda nomes, contactos, histórico de compras dos seus clientes. Pode ser desde uma agenda física até um software na nuvem."
+  },
+  {
+    "indicador_codigo": "D3",
+    "texto": "Consegue facilmente saber quantos clientes tem, o que mais vendem, ou qual o mês com mais receita?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Não faço ideia, teria de contar à mão. 5 = Consigo ver isso num relatório em segundos."
+  },
+  {
+    "indicador_codigo": "D4",
+    "texto": "Já usou dados do negócio para tomar uma decisão importante? (ex.: mudar horários, alterar preços, escolher fornecedores)",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Nunca, decido por intuição. 5 = Sempre, analiso dados antes de decidir."
+  },
+  {
+    "indicador_codigo": "D5",
+    "texto": "Faz cópias de segurança (backups) dos seus dados? Com que frequência?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Não faço backups", "Raramente (quando me lembro)", "Mensalmente", "Semanalmente ou mais", "Automático na nuvem"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Pense: se o seu computador avariasse hoje, perderia informação importante do negócio?"
+  },
+  {
+    "indicador_codigo": "I1",
+    "texto": "Que equipamentos tecnológicos usa no dia-a-dia do negócio?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Apenas telemóvel pessoal", "Computador básico", "Computador + impressora + telemóvel", "Vários dispositivos incluindo tablet/POS", "Infraestrutura completa com servidores/rede"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Liste mentalmente todos os aparelhos tecnológicos que usa para trabalhar."
+  },
+  {
+    "indicador_codigo": "I2",
+    "texto": "Usa algum software para gerir o negócio? (faturação, stock, CRM, contabilidade)",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Nenhum software, tudo manual. 5 = Vários softwares integrados para diferentes áreas."
+  },
+  {
+    "indicador_codigo": "I3",
+    "texto": "A internet no seu local de trabalho é rápida e fiável?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Sem internet ou muito lenta/instável. 5 = Fibra rápida e estável."
+  },
+  {
+    "indicador_codigo": "I4",
+    "texto": "A sua empresa tem website, redes sociais ou página no Google?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Nenhuma presença online", "Apenas redes sociais básicas", "Redes sociais ativas + Google Business", "Website + redes sociais", "Website + redes + loja online/e-commerce"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Pense em todos os sítios onde a sua empresa aparece na internet."
+  },
+  {
+    "indicador_codigo": "I5",
+    "texto": "Os diferentes programas/ferramentas que usa 'falam' entre si ou tem de passar informação manualmente?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Tudo separado, passo dados à mão. 5 = Tudo integrado e automático."
+  },
+  {
+    "indicador_codigo": "C1",
+    "texto": "Os colaboradores sentem-se confortáveis a usar computadores e ferramentas digitais?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Muito desconfortáveis, evitam tecnologia. 5 = Totalmente à vontade, usam sem dificuldade."
+  },
+  {
+    "indicador_codigo": "C2",
+    "texto": "Alguém na empresa sabe usar Excel, Google Sheets ou ferramentas semelhantes?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Ninguém sabe usar", "Uso muito básico (abrir ficheiros)", "Uso intermédio (tabelas, fórmulas simples)", "Uso avançado (gráficos, tabelas dinâmicas)", "Vários colaboradores com competências avançadas"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Pense na pessoa mais competente digitalmente na sua empresa."
+  },
+  {
+    "indicador_codigo": "C3",
+    "texto": "Se introduzisse uma nova ferramenta digital amanhã, como reagiriam os colaboradores?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Resistência total, 'não quero aprender'. 5 = Entusiasmo, 'vamos experimentar!'."
+  },
+  {
+    "indicador_codigo": "C4",
+    "texto": "Já ouviu falar de Inteligência Artificial? Consegue dar um exemplo de utilização?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Nunca ouvi falar", "Já ouvi mas não sei o que é", "Sei o que é mas não sei como aplicar", "Conheço e sei dar exemplos práticos", "Já uso IA no dia-a-dia"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "IA está em todo o lado: assistentes virtuais (Siri, Alexa), filtros de spam do email, sugestões do Netflix..."
+  },
+  {
+    "indicador_codigo": "C5",
+    "texto": "Na empresa, há investimento em formação ou é cada um por si?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Sem qualquer formação. 5 = Formação regular e estruturada para todos."
+  },
+  {
+    "indicador_codigo": "E1",
+    "texto": "Tem algum plano ou ideia para tornar o seu negócio mais digital nos próximos anos?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Não penso nisso. 5 = Tenho um plano claro com metas e prazos."
+  },
+  {
+    "indicador_codigo": "E2",
+    "texto": "Quanto investe anualmente em tecnologia?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Nada (0€)", "Muito pouco (< 500€/ano)", "Algum (500€ - 2000€/ano)", "Considerável (2000€ - 5000€/ano)", "Bastante (> 5000€/ano)"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "Inclua software, hardware, licenças, internet, manutenção, formação tecnológica."
+  },
+  {
+    "indicador_codigo": "E3",
+    "texto": "Consegue identificar pelo menos uma área do negócio onde a tecnologia poderia ajudar?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Não consigo pensar em nenhuma. 5 = Consigo identificar várias áreas concretas."
+  },
+  {
+    "indicador_codigo": "E4",
+    "texto": "Já considerou usar IA no seu negócio? Para quê?",
+    "tipo_resposta": "escolha_multipla",
+    "opcoes": ["Nunca considerei", "Já pensei mas não sei por onde começar", "Tenho interesse e já pesquisei", "Tenho planos concretos", "Já estou a implementar"],
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "IA pode ajudar em: atendimento ao cliente, gestão de stock, marketing, contabilidade, e muito mais."
+  },
+  {
+    "indicador_codigo": "E5",
+    "texto": "Quando pensa no futuro do negócio, a tecnologia faz parte dessa visão?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = A tecnologia não é relevante para o meu negócio. 5 = A tecnologia é central na minha visão de futuro."
+  },
+  {
+    "indicador_codigo": "CU1",
+    "texto": "Quando surge uma nova forma de fazer algo, a reação habitual é 'vamos experimentar' ou 'sempre fizemos assim'?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = 'Sempre fizemos assim e funciona'. 5 = 'Vamos experimentar, pode ser melhor!'."
+  },
+  {
+    "indicador_codigo": "CU2",
+    "texto": "Os colaboradores podem sugerir melhorias ou novas ideias? São ouvidos?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = As decisões são só do chefe. 5 = Todos contribuem e as ideias são valorizadas."
+  },
+  {
+    "indicador_codigo": "CU3",
+    "texto": "O dono/gestor da empresa puxa pela inovação ou prefere manter o que funciona?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Prefere manter tudo como está. 5 = Está sempre a procurar novas soluções."
+  },
+  {
+    "indicador_codigo": "CU4",
+    "texto": "Trabalham em equipa e partilham informação, ou cada um trata do seu?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Cada um trabalha isoladamente. 5 = Equipa colaborativa com partilha ativa de informação."
+  },
+  {
+    "indicador_codigo": "CU5",
+    "texto": "Quando algo tecnológico correu mal, a reação foi desistir ou tentar de outra forma?",
+    "tipo_resposta": "escala_1_5",
+    "opcoes": null,
+    "ordem": 1,
+    "obrigatoria": true,
+    "ajuda_contextual": "1 = Desistimos e voltámos ao método antigo. 5 = Tentámos de outra forma até funcionar."
+  }
+]

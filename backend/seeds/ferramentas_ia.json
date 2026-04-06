@@ -1,0 +1,137 @@
+[
+  {
+    "nome": "ChatGPT",
+    "descricao": "Assistente de IA conversacional. Pode ajudar a redigir emails, criar conteúdo de marketing, responder a perguntas frequentes de clientes, traduzir textos e analisar dados simples.",
+    "categoria": "atendimento",
+    "custo": "freemium",
+    "complexidade": "muito_facil",
+    "url": "https://chat.openai.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "construcao", "saude", "educacao"]
+  },
+  {
+    "nome": "Canva AI",
+    "descricao": "Ferramenta de design gráfico com IA integrada. Gera imagens, cria publicações para redes sociais, logótipos, folhetos e apresentações profissionais sem necessidade de conhecimento de design.",
+    "categoria": "marketing",
+    "custo": "freemium",
+    "complexidade": "facil",
+    "url": "https://www.canva.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "saude", "educacao"]
+  },
+  {
+    "nome": "Notion AI",
+    "descricao": "Plataforma de organização e gestão de projetos com assistente de IA. Ideal para organizar notas, criar bases de dados de clientes, gerir tarefas e documentar processos internos.",
+    "categoria": "gestao",
+    "custo": "freemium",
+    "complexidade": "facil",
+    "url": "https://www.notion.so",
+    "setores_alvo": ["servicos", "construcao", "educacao", "retalho"]
+  },
+  {
+    "nome": "Google Workspace (com Gemini)",
+    "descricao": "Suite de produtividade com IA incorporada em Gmail, Docs, Sheets e Drive. Automatiza emails, gera documentos, analisa dados em folhas de cálculo e organiza ficheiros.",
+    "categoria": "gestao",
+    "custo": "baixo_custo",
+    "complexidade": "facil",
+    "url": "https://workspace.google.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "construcao", "saude", "educacao"]
+  },
+  {
+    "nome": "Tidio",
+    "descricao": "Chatbot de atendimento ao cliente para websites. Responde automaticamente a perguntas frequentes, recolhe leads e redireciona clientes para WhatsApp ou email quando necessário.",
+    "categoria": "atendimento",
+    "custo": "freemium",
+    "complexidade": "facil",
+    "url": "https://www.tidio.com",
+    "setores_alvo": ["retalho", "servicos", "saude"]
+  },
+  {
+    "nome": "Mailchimp",
+    "descricao": "Plataforma de email marketing com IA que ajuda a criar campanhas, segmentar clientes automaticamente e enviar newsletters personalizadas.",
+    "categoria": "marketing",
+    "custo": "freemium",
+    "complexidade": "facil",
+    "url": "https://mailchimp.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "saude"]
+  },
+  {
+    "nome": "QuickBooks / Invoicexpress",
+    "descricao": "Software de faturação e contabilidade com funcionalidades de IA para categorizar despesas, gerar relatórios financeiros e prever fluxo de caixa.",
+    "categoria": "gestao",
+    "custo": "baixo_custo",
+    "complexidade": "medio",
+    "url": "https://www.invoicexpress.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "construcao"]
+  },
+  {
+    "nome": "Hootsuite",
+    "descricao": "Gestão de redes sociais com IA. Agenda publicações, sugere conteúdo otimizado, analisa métricas e identifica os melhores horários para publicar.",
+    "categoria": "marketing",
+    "custo": "baixo_custo",
+    "complexidade": "facil",
+    "url": "https://www.hootsuite.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "saude"]
+  },
+  {
+    "nome": "Zapier",
+    "descricao": "Plataforma de automação que conecta diferentes aplicações entre si. Automatiza tarefas repetitivas como enviar dados de formulários para Excel, notificações automáticas, etc.",
+    "categoria": "automacao",
+    "custo": "freemium",
+    "complexidade": "medio",
+    "url": "https://zapier.com",
+    "setores_alvo": ["retalho", "servicos", "construcao", "educacao"]
+  },
+  {
+    "nome": "Google Analytics",
+    "descricao": "Ferramenta gratuita de análise de websites. Mostra quantas pessoas visitam o site, de onde vêm, o que procuram e quanto tempo ficam.",
+    "categoria": "dados",
+    "custo": "gratuito",
+    "complexidade": "medio",
+    "url": "https://analytics.google.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "saude", "educacao"]
+  },
+  {
+    "nome": "Trello (com Butler AI)",
+    "descricao": "Ferramenta visual de gestão de projetos com automações inteligentes. Organiza tarefas em quadros, atribui responsáveis e automatiza fluxos de trabalho.",
+    "categoria": "gestao",
+    "custo": "freemium",
+    "complexidade": "muito_facil",
+    "url": "https://trello.com",
+    "setores_alvo": ["servicos", "construcao", "educacao", "retalho"]
+  },
+  {
+    "nome": "WhatsApp Business",
+    "descricao": "Versão empresarial do WhatsApp com catálogo de produtos, respostas automáticas, etiquetas para organizar contactos e mensagens de ausência.",
+    "categoria": "atendimento",
+    "custo": "gratuito",
+    "complexidade": "muito_facil",
+    "url": "https://business.whatsapp.com",
+    "setores_alvo": ["retalho", "restauracao", "servicos", "construcao", "saude"]
+  },
+  {
+    "nome": "AppSheet (Google)",
+    "descricao": "Criação de aplicações móveis a partir de folhas de cálculo, sem necessidade de código. Ideal para gestão de stock, registo de visitas, formulários de campo.",
+    "categoria": "operacoes",
+    "custo": "freemium",
+    "complexidade": "medio",
+    "url": "https://about.appsheet.com",
+    "setores_alvo": ["construcao", "retalho", "servicos"]
+  },
+  {
+    "nome": "Remove.bg",
+    "descricao": "Ferramenta de IA que remove automaticamente o fundo de fotografias. Útil para criar imagens de produtos para lojas online e catálogos.",
+    "categoria": "marketing",
+    "custo": "freemium",
+    "complexidade": "muito_facil",
+    "url": "https://www.remove.bg",
+    "setores_alvo": ["retalho", "servicos"]
+  },
+  {
+    "nome": "Otter.ai",
+    "descricao": "Transcrição automática de reuniões e conversas com IA. Gera resumos automáticos e pontos de ação de reuniões.",
+    "categoria": "gestao",
+    "custo": "freemium",
+    "complexidade": "facil",
+    "url": "https://otter.ai",
+    "setores_alvo": ["servicos", "educacao", "saude"]
+  }
+]

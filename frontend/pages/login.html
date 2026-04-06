@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entrar na plataforma IALO - Diagnóstico de Maturidade Digital">
+    <title>Entrar — IALO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <script>
+        (function() {
+            var currentTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+        })();
+    </script>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <a href="../index.html" class="auth-logo">
+                    <span class="logo-icon">🧠</span>
+                    <span class="logo-text">IALO</span>
+                </a>
+                <button id="theme-toggle" class="btn btn--ghost" style="position: absolute; right: 1rem; top: 1rem; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent;">🌙</button>
+                <h1 class="auth-title">Bem-vindo de volta</h1>
+                <p class="auth-subtitle">Entre para continuar o seu diagnóstico</p>
+
+                <div id="auth-error" class="auth-error" style="display:none"></div>
+
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="seu@email.pt" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+                    </div>
+                    <button type="submit" id="btn-login" class="btn btn--primary btn--full">
+                        <span class="btn-text">Entrar</span>
+                        <span class="btn-loading" style="display:none">⏳</span>
+                    </button>
+                </form>
+
+                <p class="auth-footer">
+                    Não tem conta? <a href="register.html" class="auth-link">Criar conta gratuita</a>
+                </p>
+            </div>
+        </div>
+        <div class="auth-visual">
+            <div class="auth-visual__content">
+                <h2>Diagnóstico de<br><span class="gradient-text">Maturidade Digital</span></h2>
+                <p>Descubra o nível de prontidão da sua empresa para a Inteligência Artificial com o Framework IALO.</p>
+                <div class="auth-visual__stats">
+                    <div class="stat"><span class="stat-value">5</span><span class="stat-label">Dimensões</span></div>
+                    <div class="stat"><span class="stat-value">25</span><span class="stat-label">Indicadores</span></div>
+                    <div class="stat"><span class="stat-value">15</span><span class="stat-label">Ferramentas IA</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Resultados do Diagnóstico IALO - Relatório de Maturidade Digital">
+    <title>Resultados — IALO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/resultados.css">
+    <script>
+        (function() {
+            var currentTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+        })();
+    </script>
+</head>
+<body>
+    <div class="results-layout">
+        <!-- Header -->
+        <header class="results-header">
+            <div class="results-header__left">
+                <a href="dashboard.html" class="quiz-back">← Dashboard</a>
+                <h1>Relatório de Diagnóstico</h1>
+            </div>
+            <div class="results-header__right">
+                <button id="theme-toggle" class="btn btn--ghost" style="margin-right: 1rem; padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent;">🌙</button>
+                <button id="btn-download-pdf" class="btn btn--ghost">📄 Descarregar PDF</button>
+            </div>
+        </header>
+
+        <!-- Loading State -->
+        <div id="results-loading" class="results-loading">
+            <div class="spinner"></div>
+            <p>A gerar relatório...</p>
+        </div>
+
+        <!-- Content -->
+        <div id="results-content" class="results-content" style="display:none">
+            <!-- Score Hero -->
+            <section class="score-hero">
+                <div class="score-circle" id="score-circle">
+                    <svg viewBox="0 0 200 200" class="score-svg">
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--color-border)" stroke-width="8"/>
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--color-primary-500)" stroke-width="8"
+                                stroke-dasharray="534" stroke-dashoffset="534" stroke-linecap="round"
+                                transform="rotate(-90 100 100)" id="score-arc"/>
+                    </svg>
+                    <div class="score-value" id="score-value">0%</div>
+                </div>
+                <div class="score-info">
+                    <h2 id="empresa-nome">Empresa</h2>
+                    <div class="score-nivel" id="score-nivel">Nível 0 — Desconhecido</div>
+                    <p class="score-descricao" id="score-descricao"></p>
+                </div>
+            </section>
+
+            <!-- Radar Chart -->
+            <section class="section-block">
+                <h3>📊 Maturidade por Dimensão</h3>
+                <div class="radar-container">
+                    <canvas id="radar-chart" width="500" height="400"></canvas>
+                </div>
+            </section>
+
+            <!-- Dimension Bars -->
+            <section class="section-block">
+                <h3>📈 Pontuações Detalhadas</h3>
+                <div id="dim-bars" class="dim-bars"></div>
+            </section>
+
+            <!-- Strengths & Gaps -->
+            <div class="two-cols">
+                <section class="section-block col-green">
+                    <h3>✅ Pontos Fortes</h3>
+                    <div id="pontos-fortes" class="list-items"></div>
+                </section>
+                <section class="section-block col-red">
+                    <h3>⚠️ Necessidades Críticas</h3>
+                    <div id="necessidades" class="list-items"></div>
+                </section>
+            </div>
+
+            <!-- Next Steps -->
+            <section class="section-block">
+                <h3>🚀 Primeiros Passos Recomendados</h3>
+                <div id="primeiros-passos" class="steps-list"></div>
+            </section>
+
+            <!-- Recommendations -->
+            <section class="section-block">
+                <h3>🤖 Ferramentas IA Recomendadas</h3>
+                <div id="recomendacoes" class="recs-grid"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/resultados.js"></script>
+    <script src="../js/theme.js"></script>
+</body>
+</html>

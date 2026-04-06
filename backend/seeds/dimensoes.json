@@ -1,0 +1,37 @@
+[
+  {
+    "codigo": "DADOS",
+    "nome": "Dados",
+    "descricao": "Avalia como a organização recolhe, armazena, organiza e utiliza dados para suporte à decisão.",
+    "peso": 0.25,
+    "ordem": 1
+  },
+  {
+    "codigo": "INFRA",
+    "nome": "Infraestrutura",
+    "descricao": "Avalia as ferramentas tecnológicas, hardware, software e conectividade disponíveis na organização.",
+    "peso": 0.20,
+    "ordem": 2
+  },
+  {
+    "codigo": "COMP",
+    "nome": "Competências",
+    "descricao": "Avalia o nível de literacia digital e capacidades técnicas das pessoas na organização.",
+    "peso": 0.20,
+    "ordem": 3
+  },
+  {
+    "codigo": "ESTR",
+    "nome": "Estratégia",
+    "descricao": "Avalia a existência de visão estratégica para a digitalização e a adoção de IA.",
+    "peso": 0.20,
+    "ordem": 4
+  },
+  {
+    "codigo": "CULT",
+    "nome": "Cultura",
+    "descricao": "Avalia a cultura organizacional face à inovação, mudança e adoção tecnológica.",
+    "peso": 0.15,
+    "ordem": 5
+  }
+]

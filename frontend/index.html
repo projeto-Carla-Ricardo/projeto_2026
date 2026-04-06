@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Framework IALO - Diagnóstico de Maturidade Digital e Prontidão para IA em Micro e Pequenas Empresas">
+    <title>IALO — Inteligência Artificial para a sua Organização</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (function() {
+            var currentTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="#" class="nav__logo">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">IALO</span>
+            </a>
+            <ul class="nav__menu" id="nav-menu">
+                <li><a href="#about" class="nav__link">O que é</a></li>
+                <li><a href="#how-it-works" class="nav__link">Como funciona</a></li>
+                <li><a href="#dimensions" class="nav__link">Dimensões</a></li>
+                <li><a href="pages/login.html" class="nav__link nav__link--cta">Entrar</a></li>
+                <li><button id="theme-toggle" class="btn btn--ghost" style="padding: 0.5rem; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent;">🌙</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="container hero__content">
+            <div class="hero__text">
+                <span class="hero__badge">Framework IALO</span>
+                <h1 class="hero__title">
+                    Descubra se a sua empresa está
+                    <span class="gradient-text">pronta para a IA</span>
+                </h1>
+                <p class="hero__description">
+                    Diagnóstico gratuito de maturidade digital para micro e pequenas empresas. 
+                    Um assistente de IA guia-o por todo o processo e gera um plano de ação personalizado.
+                </p>
+                <div class="hero__actions">
+                    <a href="pages/register.html" class="btn btn--primary btn--lg">
+                        Começar Diagnóstico Gratuito →
+                    </a>
+                    <a href="#how-it-works" class="btn btn--ghost btn--lg">
+                        Saber mais
+                    </a>
+                </div>
+            </div>
+            <div class="hero__visual">
+                <div class="radar-preview">
+                    <div class="radar-placeholder">
+                        <svg viewBox="0 0 200 200" class="radar-svg">
+                            <polygon points="100,20 175,65 155,155 45,155 25,65" fill="none" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <polygon points="100,40 160,75 145,145 55,145 40,75" fill="none" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <polygon points="100,60 145,85 135,135 65,135 55,85" fill="none" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <polygon points="100,80 130,95 125,125 75,125 70,95" fill="none" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <polygon points="100,35 165,80 140,150 50,130 40,70" fill="var(--color-primary-400)" fill-opacity="0.3" stroke="var(--color-primary-500)" stroke-width="2"/>
+                            <line x1="100" y1="100" x2="100" y2="20" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <line x1="100" y1="100" x2="175" y2="65" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <line x1="100" y1="100" x2="155" y2="155" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <line x1="100" y1="100" x2="45" y2="155" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <line x1="100" y1="100" x2="25" y2="65" stroke="var(--color-primary-200)" stroke-width="1"/>
+                            <text x="100" y="12" text-anchor="middle" fill="var(--color-text)" font-size="8" font-weight="600">Dados</text>
+                            <text x="185" y="68" text-anchor="start" fill="var(--color-text)" font-size="8" font-weight="600">Infra</text>
+                            <text x="160" y="165" text-anchor="start" fill="var(--color-text)" font-size="8" font-weight="600">Comp.</text>
+                            <text x="15" y="165" text-anchor="end" fill="var(--color-text)" font-size="8" font-weight="600">Estr.</text>
+                            <text x="15" y="68" text-anchor="end" fill="var(--color-text)" font-size="8" font-weight="600">Cultura</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <h2 class="section__title">Como funciona?</h2>
+            <p class="section__subtitle">Três passos simples para transformar o seu negócio</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-card__number">01</div>
+                    <div class="step-card__icon">💬</div>
+                    <h3 class="step-card__title">Diagnóstico Guiado</h3>
+                    <p class="step-card__text">Um assistente de IA conversa consigo sobre o seu negócio. Sem jargão técnico — perguntas simples sobre o dia-a-dia da empresa.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-card__number">02</div>
+                    <div class="step-card__icon">🔍</div>
+                    <h3 class="step-card__title">Análise Inteligente</h3>
+                    <p class="step-card__text">O Framework IALO analisa as suas respostas e avalia 5 dimensões de maturidade digital: Dados, Infraestrutura, Competências, Estratégia e Cultura.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-card__number">03</div>
+                    <div class="step-card__icon">📋</div>
+                    <h3 class="step-card__title">Roteiro Personalizado</h3>
+                    <p class="step-card__text">Recebe um relatório com pontos fortes, necessidades e um plano de ação com ferramentas de IA acessíveis para o seu caso específico.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dimensions -->
+    <section class="section section--alt" id="dimensions">
+        <div class="container">
+            <h2 class="section__title">As 5 Dimensões IALO</h2>
+            <p class="section__subtitle">Avaliamos a sua empresa em cinco áreas essenciais para a adoção de IA</p>
+            <div class="dimensions-grid">
+                <div class="dim-card" style="--accent: var(--color-dados)">
+                    <div class="dim-card__icon">📊</div>
+                    <h3 class="dim-card__title">Dados</h3>
+                    <p class="dim-card__weight">Peso: 25%</p>
+                    <p class="dim-card__text">Como recolhe, armazena e utiliza dados para tomar decisões.</p>
+                </div>
+                <div class="dim-card" style="--accent: var(--color-infra)">
+                    <div class="dim-card__icon">🖥️</div>
+                    <h3 class="dim-card__title">Infraestrutura</h3>
+                    <p class="dim-card__weight">Peso: 20%</p>
+                    <p class="dim-card__text">Hardware, software, internet e presença digital disponíveis.</p>
+                </div>
+                <div class="dim-card" style="--accent: var(--color-comp)">
+                    <div class="dim-card__icon">🎓</div>
+                    <h3 class="dim-card__title">Competências</h3>
+                    <p class="dim-card__weight">Peso: 20%</p>
+                    <p class="dim-card__text">Literacia digital e capacidades técnicas das pessoas.</p>
+                </div>
+                <div class="dim-card" style="--accent: var(--color-estr)">
+                    <div class="dim-card__icon">🎯</div>
+                    <h3 class="dim-card__title">Estratégia</h3>
+                    <p class="dim-card__weight">Peso: 20%</p>
+                    <p class="dim-card__text">Visão e planeamento para digitalização e adoção de IA.</p>
+                </div>
+                <div class="dim-card" style="--accent: var(--color-cult)">
+                    <div class="dim-card__icon">🌱</div>
+                    <h3 class="dim-card__title">Cultura</h3>
+                    <p class="dim-card__weight">Peso: 15%</p>
+                    <p class="dim-card__text">Abertura à mudança, inovação e adoção tecnológica.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-section">
+        <div class="container cta-content">
+            <h2 class="cta__title">Pronto para descobrir o potencial digital da sua empresa?</h2>
+            <p class="cta__text">O diagnóstico é gratuito, demora menos de 15 minutos e gera um relatório personalizado.</p>
+            <a href="pages/register.html" class="btn btn--primary btn--lg">Começar Agora →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer__content">
+            <div class="footer__brand">
+                <span class="logo-icon">🧠</span>
+                <span class="logo-text">IALO</span>
+                <p class="footer__tagline">Framework de Inteligência Artificial para Learning Organisations</p>
+            </div>
+            <div class="footer__info">
+                <p>Projeto Final — Engenharia Informática</p>
+                <p>Universidade Aberta · 2025/2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/theme.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
