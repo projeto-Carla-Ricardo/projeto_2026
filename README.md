@@ -76,4 +76,6 @@ Obter chave em: https://aistudio.google.com/apikey
 Sem esta chave, a aplicação funciona normalmente — apenas o chat responde em modo offline.
 
 ## 👥 Autores
-Santos & Mamede (2026) — Universidade Aberta
+Ricardo & Carla — Engenharia Informática — Universidade Aberta
+
+Framework teórico: Santos & Mamede (2026) — *Artificial Intelligence in a Learning Organization*

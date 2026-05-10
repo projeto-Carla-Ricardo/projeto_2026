@@ -42,7 +42,8 @@ def build_pdf():
     story.append(Paragraph("Artificial Intelligence in a Learning Organization", ParagraphStyle('Cover2', parent=body, alignment=TA_CENTER, fontSize=12, textColor=GRAY)))
     story.append(Spacer(1, 1*cm))
     story.append(Paragraph("Projeto de Engenharia Informática — Universidade Aberta", ParagraphStyle('Cover3', parent=body, alignment=TA_CENTER, fontSize=11, textColor=GRAY)))
-    story.append(Paragraph("Santos & Mamede (2026)", ParagraphStyle('Cover4', parent=body, alignment=TA_CENTER, fontSize=11, textColor=GRAY)))
+    story.append(Paragraph("Ricardo & Carla", ParagraphStyle('Cover4', parent=body, alignment=TA_CENTER, fontSize=11, textColor=GRAY)))
+    story.append(Paragraph("Baseado no framework de Santos & Mamede (2026)", ParagraphStyle('Cover5', parent=body, alignment=TA_CENTER, fontSize=10, textColor=GRAY)))
     story.append(Spacer(1, 2*cm))
     story.append(Paragraph("Maio 2026", ParagraphStyle('Date', parent=body, alignment=TA_CENTER, fontSize=12, textColor=AILO_DARK)))
     story.append(PageBreak())
@@ -70,7 +71,7 @@ def build_pdf():
 
     # 1. ENQUADRAMENTO
     story.append(Paragraph("1. Enquadramento e Objetivos", h1))
-    story.append(Paragraph("A Fase 2 do projeto AILO teve como objetivo transformar toda a documentação conceptual e técnica produzida na Fase 1 numa plataforma web funcional (MVP — Minimum Viable Product). O AILO é uma plataforma de diagnóstico de maturidade organizacional para integração de Inteligência Artificial nas Organizações Aprendentes, baseada no framework de Santos & Mamede (2026).", body))
+    story.append(Paragraph("A Fase 2 do projeto AILO teve como objetivo transformar toda a documentação conceptual e técnica produzida na Fase 1 numa plataforma web funcional (MVP — Minimum Viable Product). O AILO é uma plataforma de diagnóstico de maturidade organizacional para integração de Inteligência Artificial nas Organizações Aprendentes, baseada no framework teórico de Santos & Mamede (2026). O projeto é desenvolvido por Ricardo e Carla no âmbito do curso de Engenharia Informática.", body))
     story.append(Paragraph("O framework AILO organiza-se em 6 camadas interdependentes:", body))
     camadas = [
         ("Organizacional", "Estratégia, processos, decisão e criação de valor"),
