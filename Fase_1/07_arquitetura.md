@@ -272,19 +272,10 @@ T --> P
 
 ## 7. Deployment (Demonstração)
 
-```
-    ┌─────────────────────────────┐
-    │    Servidor de Demonstração  │
-    │                             │
-    │    gunicorn (WSGI)          │
-    │         │                   │
-    │         ▼                   │
-    │    Flask App                │
-    │    + SQLite DB              │
-    │    + Static Files (frontend)│
-    │                             │
-    │    Port: 5000               │
-    └─────────────────────────────┘
+```mermaid
+flowchart TB
+
+S["Servidor de Demonstração<br/><br/>gunicorn (WSGI)<br/><br/>↓<br/><br/>Flask App<br/>+ SQLite DB<br/>+ Static Files (frontend)<br/><br/>Port: 5000"]
 ```
 
 Para demonstração académica, o Flask serve também os ficheiros estáticos do frontend. Em produção, seria separado com Nginx.
