@@ -86,91 +86,98 @@ IA --> G
 
 ## 3. Estrutura de Pastas
 
-```
-Projeto_iALO/
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py           # Flask app factory
-│   │   ├── config.py             # Configurações (dev/prod)
-│   │   ├── models/               # Modelos SQLAlchemy
-│   │   │   ├── __init__.py
-│   │   │   ├── utilizador.py
-│   │   │   ├── organizacao.py
-│   │   │   ├── ailo.py           # Camadas, Componentes, Indicadores
-│   │   │   ├── avaliacao.py
-│   │   │   ├── resposta.py
-│   │   │   ├── resultado.py
-│   │   │   ├── ferramenta.py
-│   │   │   └── conversa.py
-│   │   ├── routes/               # Endpoints da API
-│   │   │   ├── __init__.py
-│   │   │   ├── auth.py
-│   │   │   ├── organizacoes.py
-│   │   │   ├── ailo.py
-│   │   │   ├── avaliacoes.py
-│   │   │   ├── respostas.py
-│   │   │   ├── resultados.py
-│   │   │   ├── chat.py
-│   │   │   └── relatorios.py
-│   │   ├── services/             # Lógica de negócio
-│   │   │   ├── __init__.py
-│   │   │   ├── scoring.py        # Motor de scoring AILO
-│   │   │   ├── interdependencias.py
-│   │   │   ├── ia_assistant.py   # Integração Gemini
-│   │   │   ├── report_generator.py
-│   │   │   └── recomendacoes.py
-│   │   └── utils/
-│   │       ├── auth.py           # JWT helpers
-│   │       ├── decorators.py     # @login_required, @admin_required
-│   │       └── validators.py
-│   ├── migrations/               # Alembic migrations
-│   ├── seeds/
-│   │   ├── camadas.py            # Seed das 6 camadas
-│   │   ├── componentes.py        # Seed dos 23 componentes
-│   │   ├── indicadores.py        # Seed dos 51 indicadores
-│   │   └── ferramentas.py        # Seed do catálogo de ferramentas
-│   ├── tests/
-│   │   ├── test_auth.py
-│   │   ├── test_scoring.py
-│   │   ├── test_api.py
-│   │   └── test_interdependencias.py
-│   ├── .env.example
-│   ├── requirements.txt
-│   ├── run.py
-│   └── seed.py                   # Script para popular BD
-│
-├── frontend/
-│   ├── index.html                # Landing page
-│   ├── css/
-│   │   ├── main.css              # Design system
-│   │   ├── questionario.css
-│   │   ├── dashboard.css
-│   │   └── relatorio.css
-│   ├── js/
-│   │   ├── app.js                # Routing e inicialização
-│   │   ├── api.js                # Wrapper para chamadas à API
-│   │   ├── auth.js               # Login/registo
-│   │   ├── questionario.js       # Lógica do questionário por camada
-│   │   ├── chat.js               # Chat com assistente IA
-│   │   ├── dashboard.js          # Gráficos e visualizações
-│   │   └── relatorio.js          # Visualização de relatório
-│   └── pages/
-│       ├── login.html
-│       ├── register.html
-│       ├── organizacoes.html
-│       ├── questionario.html
-│       ├── dashboard.html
-│       └── relatorio.html
-│
-├── docs/                         # Documentação do projeto
-│   └── Fase_1/                   # (esta pasta)
-│
-├── Fase_1/                       # Deliverables da Fase 1
-├── IALO_Eng.docx                 # Framework do professor
-├── IALO_pt.docx
-├── Relatorio_Desenvolvimento.docx
-├── relatório_inicial_IALO.docx
-└── .gitignore
+```mermaid
+flowchart TB
+
+ROOT["📁 Projeto_AILO"]
+
+ROOT --> BACK["📁 backend"]
+ROOT --> FRONT["📁 frontend"]
+ROOT --> DOCS["📁 docs"]
+ROOT --> FASE["📁 Fase_1"]
+ROOT --> DOCX["📄 Documentos .docx"]
+ROOT --> GIT["📄 .gitignore"]
+
+BACK --> APP["📁 app"]
+BACK --> MIG["📁 migrations"]
+BACK --> SEEDS["📁 seeds"]
+BACK --> TESTS["📁 tests"]
+BACK --> ENV["📄 .env.example"]
+BACK --> REQ["📄 requirements.txt"]
+BACK --> RUN["📄 run.py"]
+BACK --> SEEDPY["📄 seed.py"]
+
+APP --> MODELS["📁 models"]
+APP --> ROUTES["📁 routes"]
+APP --> SERVICES["📁 services"]
+APP --> UTILS["📁 utils"]
+APP --> INIT["📄 __init__.py"]
+APP --> CONFIG["📄 config.py"]
+
+MODELS --> M1["utilizador.py"]
+MODELS --> M2["organizacao.py"]
+MODELS --> M3["ailo.py"]
+MODELS --> M4["avaliacao.py"]
+MODELS --> M5["resposta.py"]
+MODELS --> M6["resultado.py"]
+MODELS --> M7["ferramenta.py"]
+MODELS --> M8["conversa.py"]
+
+ROUTES --> R1["auth.py"]
+ROUTES --> R2["organizacoes.py"]
+ROUTES --> R3["ailo.py"]
+ROUTES --> R4["avaliacoes.py"]
+ROUTES --> R5["respostas.py"]
+ROUTES --> R6["resultados.py"]
+ROUTES --> R7["chat.py"]
+ROUTES --> R8["relatorios.py"]
+
+SERVICES --> S1["scoring.py"]
+SERVICES --> S2["interdependencias.py"]
+SERVICES --> S3["ia_assistant.py"]
+SERVICES --> S4["report_generator.py"]
+SERVICES --> S5["recomendacoes.py"]
+
+UTILS --> U1["auth.py"]
+UTILS --> U2["decorators.py"]
+UTILS --> U3["validators.py"]
+
+SEEDS --> SD1["camadas.py"]
+SEEDS --> SD2["componentes.py"]
+SEEDS --> SD3["indicadores.py"]
+SEEDS --> SD4["ferramentas.py"]
+
+TESTS --> T1["test_auth.py"]
+TESTS --> T2["test_scoring.py"]
+TESTS --> T3["test_api.py"]
+TESTS --> T4["test_interdependencias.py"]
+
+FRONT --> HTML["📄 index.html"]
+FRONT --> CSS["📁 css"]
+FRONT --> JS["📁 js"]
+FRONT --> PAGES["📁 pages"]
+
+CSS --> C1["main.css"]
+CSS --> C2["questionario.css"]
+CSS --> C3["dashboard.css"]
+CSS --> C4["relatorio.css"]
+
+JS --> J1["app.js"]
+JS --> J2["api.js"]
+JS --> J3["auth.js"]
+JS --> J4["questionario.js"]
+JS --> J5["chat.js"]
+JS --> J6["dashboard.js"]
+JS --> J7["relatorio.js"]
+
+PAGES --> P1["login.html"]
+PAGES --> P2["register.html"]
+PAGES --> P3["organizacoes.html"]
+PAGES --> P4["questionario.html"]
+PAGES --> P5["dashboard.html"]
+PAGES --> P6["relatorio.html"]
+
+DOCS --> D1["📁 Fase_1"]
 ```
 
 ---
