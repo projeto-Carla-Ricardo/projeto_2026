@@ -133,13 +133,78 @@ C --> V
 
 ### 3.2. Componentes (exemplo — Camada Organizacional)
 
-```sql
--- Assumindo camada_id = 1 para Organizacional
-INSERT INTO componentes (camada_id, nome, nome_en, descricao, peso, ordem) VALUES
-(1, 'Estratégia', 'Strategy', 'Alinhamento entre aprendizagem, inovação e objetivos organizacionais.', 1.0, 1),
-(1, 'Processos', 'Processes', 'Integração da aprendizagem nos fluxos de trabalho e rotinas de gestão.', 1.0, 2),
-(1, 'Decisão', 'Decision-Making', 'Utilização de evidência suportada por IA preservando julgamento humano.', 1.0, 3),
-(1, 'Valor', 'Value', 'Impacto no desempenho, inovação, resiliência e sustentabilidade.', 1.0, 4);
+```mermaid
+flowchart TB
+
+O["🏢 Organizacional"]
+
+OE["Estratégia"]
+OP["Processos"]
+OD["Decisão"]
+OV["Valor"]
+
+H["👥 Humana"]
+
+HP["Pessoas"]
+HC["Cultura"]
+HA["Autonomia"]
+HE["Ética"]
+
+A["📚 Aprendizagem"]
+
+AC["Contextos Adaptativos"]
+AE["Experiências Personalizadas"]
+AI["Integração Formal-Informal"]
+
+C["🤖 Cognitiva (IA)"]
+
+CG["Geração"]
+CR["Recomendação"]
+CS["Síntese"]
+CP["Previsão"]
+
+T["💻 Tecnológica"]
+
+TP["Plataformas"]
+TD["Dados"]
+TI["Integração"]
+TS["Segurança"]
+
+V["📈 Avaliação"]
+
+VE["Evidência"]
+VF["Avaliação Formativa"]
+VC["Competências"]
+VI["Impacto Organizacional"]
+
+O --> OE
+O --> OP
+O --> OD
+O --> OV
+
+H --> HP
+H --> HC
+H --> HA
+H --> HE
+
+A --> AC
+A --> AE
+A --> AI
+
+C --> CG
+C --> CR
+C --> CS
+C --> CP
+
+T --> TP
+T --> TD
+T --> TI
+T --> TS
+
+V --> VE
+V --> VF
+V --> VC
+V --> VI
 ```
 
 > Os seeds completos para todas as 6 camadas, 23 componentes e 51 indicadores estão definidos no ficheiro `02_indicadores_por_camada.md` e serão implementados na Fase 2.
