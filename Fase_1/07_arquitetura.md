@@ -216,32 +216,20 @@ G --> P
 
 ### 4.2. Assistente IA (`services/ia_assistant.py`)
 
-```
-    Mensagem do Utilizador
-            │
-            ▼
-    ┌───────────────────────┐
-    │  Construir Contexto   │
-    │                       │
-    │  - System prompt AILO │
-    │  - Camada atual       │
-    │  - Tipo organização   │
-    │  - Respostas dadas    │
-    │  - Histórico chat     │
-    └──────────┬────────────┘
-               │
-               ▼
-    ┌───────────────────────┐
-    │  Google Gemini API    │
-    │  (gemini-2.0-flash)   │
-    └──────────┬────────────┘
-               │
-               ▼
-    ┌───────────────────────┐
-    │  Resposta formatada   │
-    │  + Gravar em BD       │
-    └───────────────────────┘
-```
+```mermaid
+flowchart TB
+
+M["Mensagem do Utilizador"]
+
+C["Construir Contexto<br/>- System prompt AILO<br/>- Camada atual<br/>- Tipo de organização<br/>- Respostas dadas<br/>- Histórico do chat"]
+
+G["Google Gemini API<br/>(gemini-2.0-flash)"]
+
+R["Resposta formatada<br/>+ Gravar em BD"]
+
+M --> C
+C --> G
+G --> R
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
