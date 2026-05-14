@@ -186,68 +186,93 @@ DOCS --> D1["📁 Fase_1"]
 
 ### 4.1. Motor de Scoring (`services/scoring.py`)
 
-```mermaid
-flowchart TB
-
-R["Respostas<br/>(51 indicadores, score 1-5)"]
-
-C["Agrupar por<br/>Componente<br/>(23 componentes)"]
-
-CA["Agrupar por<br/>Camada<br/>(6 camadas)"]
-
-G["Índice Global<br/>AILO"]
-
-I["Interdependências<br/>Análise de pares"]
-
-CR["Mapeamento<br/>CR1-CR6"]
-
-P["Pontos Fortes<br/>e Lacunas"]
-
-R -->|"média ponderada"| C
-
-C -->|"média ponderada"| CA
-
-CA -->|"pesos das camadas"| G
-
-G --> I
-G --> CR
-G --> P
+```
+                    Respostas (51 indicadores, score 1-5)
+                               │
+                               ▼
+                    ┌───────────────────────┐
+                    │  Agrupar por          │
+                    │  Componente           │
+                    │  (23 componentes)     │
+                    └──────────┬────────────┘
+                               │ média ponderada
+                               ▼
+                    ┌───────────────────────┐
+                    │  Agrupar por          │
+                    │  Camada               │
+                    │  (6 camadas)          │
+                    └──────────┬────────────┘
+                               │ média ponderada (com pesos das camadas)
+                               ▼
+                    ┌───────────────────────┐
+                    │  Índice Global        │
+                    │  AILO                 │
+                    └──────────┬────────────┘
+                               │
+                    ┌──────────┼──────────┐
+                    ▼          ▼          ▼
+              ┌──────────┐ ┌──────┐ ┌────────────┐
+              │Interdep. │ │ CRs  │ │ Pontos     │
+              │análise   │ │mapping│ │ fortes/    │
+              │de pares  │ │CR1-6 │ │ lacunas    │
+              └──────────┘ └──────┘ └────────────┘
 ```
 
 ### 4.2. Assistente IA (`services/ia_assistant.py`)
 
-```mermaid
-flowchart TB
-
-M["Mensagem do Utilizador"]
-
-C["Construir Contexto<br/>- System prompt AILO<br/>- Camada atual<br/>- Tipo de organização<br/>- Respostas dadas<br/>- Histórico do chat"]
-
-G["Google Gemini API<br/>(gemini-2.0-flash)"]
-
-R["Resposta formatada<br/>+ Gravar em BD"]
-
-M --> C
-C --> G
-G --> R
+```
+    Mensagem do Utilizador
+            │
+            ▼
+    ┌───────────────────────┐
+    │  Construir Contexto   │
+    │                       │
+    │  - System prompt AILO │
+    │  - Camada atual       │
+    │  - Tipo organização   │
+    │  - Respostas dadas    │
+    │  - Histórico chat     │
+    └──────────┬────────────┘
+               │
+               ▼
+    ┌───────────────────────┐
+    │  Google Gemini API    │
+    │  (gemini-2.0-flash)   │
+    └──────────┬────────────┘
+               │
+               ▼
+    ┌───────────────────────┐
+    │  Resposta formatada   │
+    │  + Gravar em BD       │
+    └───────────────────────┘
+```
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
-```mermaid
-flowchart TB
-
-D["Dados da avaliação completa"]
-
-T["Template do relatório<br/>1. Capa<br/>2. Resumo Executivo<br/>3. Perfil da Organização<br/>4. Diagnóstico das 6 camadas<br/>5. Interdependências<br/>6. CRs relevantes<br/>7. Recomendações<br/>8. Roteiro de Implementação"]
-
-W["Web View<br/>(HTML)"]
-
-P["PDF<br/>Download"]
-
-D --> T
-
-T --> W
-T --> P
+```
+    Dados da avaliação completa
+            │
+            ▼
+    ┌───────────────────────┐
+    │  Template do relatório│
+    │                       │
+    │  1. Capa              │
+    │  2. Resumo Executivo  │
+    │  3. Perfil Org.       │
+    │  4. Diagnóstico x6    │
+    │     camadas           │
+    │  5. Interdependências │
+    │  6. CRs relevantes    │
+    │  7. Recomendações     │
+    │  8. Roteiro           │
+    └──────────┬────────────┘
+               │
+          ┌────┴────┐
+          ▼         ▼
+    ┌──────────┐ ┌──────────┐
+    │ Web View │ │  PDF     │
+    │ (HTML)   │ │ Download │
+    └──────────┘ └──────────┘
 ```
 
 ---
