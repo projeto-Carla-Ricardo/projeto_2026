@@ -186,36 +186,32 @@ DOCS --> D1["📁 Fase_1"]
 
 ### 4.1. Motor de Scoring (`services/scoring.py`)
 
-```
-                    Respostas (51 indicadores, score 1-5)
-                               │
-                               ▼
-                    ┌───────────────────────┐
-                    │  Agrupar por          │
-                    │  Componente           │
-                    │  (23 componentes)     │
-                    └──────────┬────────────┘
-                               │ média ponderada
-                               ▼
-                    ┌───────────────────────┐
-                    │  Agrupar por          │
-                    │  Camada               │
-                    │  (6 camadas)          │
-                    └──────────┬────────────┘
-                               │ média ponderada (com pesos das camadas)
-                               ▼
-                    ┌───────────────────────┐
-                    │  Índice Global        │
-                    │  AILO                 │
-                    └──────────┬────────────┘
-                               │
-                    ┌──────────┼──────────┐
-                    ▼          ▼          ▼
-              ┌──────────┐ ┌──────┐ ┌────────────┐
-              │Interdep. │ │ CRs  │ │ Pontos     │
-              │análise   │ │mapping│ │ fortes/    │
-              │de pares  │ │CR1-6 │ │ lacunas    │
-              └──────────┘ └──────┘ └────────────┘
+```mermaid
+flowchart TB
+
+R["Respostas<br/>(51 indicadores, score 1-5)"]
+
+C["Agrupar por<br/>Componente<br/>(23 componentes)"]
+
+CA["Agrupar por<br/>Camada<br/>(6 camadas)"]
+
+G["Índice Global<br/>AILO"]
+
+I["Interdependências<br/>Análise de pares"]
+
+CR["Mapeamento<br/>CR1-CR6"]
+
+P["Pontos Fortes<br/>e Lacunas"]
+
+R -->|"média ponderada"| C
+
+C -->|"média ponderada"| CA
+
+CA -->|"pesos das camadas"| G
+
+G --> I
+G --> CR
+G --> P
 ```
 
 ### 4.2. Assistente IA (`services/ia_assistant.py`)
