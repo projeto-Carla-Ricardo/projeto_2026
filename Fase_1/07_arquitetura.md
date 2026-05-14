@@ -4,68 +4,65 @@
 
 A arquitetura segue um padrão de **3 camadas** (frontend, backend, base de dados) com integração externa a um serviço LLM. A escolha reflete as necessidades académicas do projeto — simplicidade de deployment, facilidade de manutenção e alinhamento com as disciplinas do curso.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BROWSER (Cliente)                        │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                    FRONTEND                               │  │
-│  │                                                          │  │
-│  │   HTML5 + CSS3 + JavaScript (Vanilla)                    │  │
-│  │                                                          │  │
-│  │   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │  │
-│  │   │ Landing  │ │ Auth     │ │Question. │ │Dashboard │  │  │
-│  │   │ Page     │ │ Pages    │ │ AILO     │ │& Reports │  │  │
-│  │   └──────────┘ └──────────┘ └─────┬────┘ └──────────┘  │  │
-│  │                                   │                      │  │
-│  │                              ┌────┴────┐                 │  │
-│  │                              │ Chat IA │                 │  │
-│  │                              │ Panel   │                 │  │
-│  │                              └─────────┘                 │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ HTTP/REST (JSON)
-                          │ JWT Auth
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        BACKEND (Servidor)                       │
-│                                                                 │
-│   Python / Flask                                                │
-│                                                                 │
-│   ┌─────────────────────────────────────────────────────────┐  │
-│   │                    API RESTful                           │  │
-│   │                                                         │  │
-│   │  /auth/*    /organizacoes/*    /avaliacoes/*             │  │
-│   │  /ailo/*    /relatorios/*      /chat/*                   │  │
-│   └──────────────────┬──────────────────────────────────────┘  │
-│                      │                                         │
-│   ┌──────────┐  ┌────┴─────┐  ┌──────────┐  ┌──────────────┐ │
-│   │ Auth     │  │ Scoring  │  │ Report   │  │ IA Service   │ │
-│   │ Module   │  │ Engine   │  │ Generator│  │ (LLM Proxy)  │ │
-│   │          │  │          │  │          │  │              │ │
-│   │ JWT      │  │ Por      │  │ PDF      │  │ Gemini API   │ │
-│   │ bcrypt   │  │ Camada   │  │ Template │  │ Prompt Eng.  │ │
-│   │ RBAC     │  │ Interdep.│  │ Charts   │  │ Context Mgmt │ │
-│   └──────────┘  │ CR1-CR6  │  └──────────┘  └──────┬───────┘ │
-│                 └──────────┘                        │          │
-│                      │                              │          │
-│                 ┌────┴─────┐                        │          │
-│                 │  ORM     │                  ┌─────┴────┐    │
-│                 │ SQLAlch. │                  │ Google   │    │
-│                 └────┬─────┘                  │ Gemini   │    │
-│                      │                        │ API      │    │
-└──────────────────────┼────────────────────────┴──────────┘────┘
-                       │                        (Externo)
-                       ▼
-┌─────────────────────────────────┐
-│      BASE DE DADOS              │
-│                                 │
-│   SQLite (dev)                  │
-│   PostgreSQL (prod)             │
-│                                 │
-│   12 tabelas                    │
-│   (ver modelo_dados.md)         │
-└─────────────────────────────────┘
+```mermaid
+flowchart TB
+
+subgraph BROWSER["🌐 Browser (Cliente)"]
+
+subgraph FRONT["🎨 Frontend"]
+F1["Landing Page"]
+F2["Autenticação"]
+F3["Questionário AILO"]
+F4["Painel & Relatórios"]
+F5["Assistente IA"]
+end
+
+end
+
+subgraph BACK["⚙️ Backend (Servidor Flask)"]
+
+subgraph API["API RESTful"]
+A1["/auth/*"]
+A2["/organizacoes/*"]
+A3["/avaliacoes/*"]
+A4["/ailo/*"]
+A5["/relatorios/*"]
+A6["/chat/*"]
+end
+
+AUTH["🔐 Módulo de Autenticação<br/>JWT<br/>bcrypt<br/>RBAC"]
+
+SCORING["📊 Motor de Pontuação<br/>Por Camada<br/>Interdependências<br/>CR1-CR6"]
+
+REPORT["📄 Gerador de Relatórios<br/>PDF<br/>Templates<br/>Gráficos"]
+
+IA["🤖 Serviço IA<br/>Gemini API<br/>Prompt Engineering<br/>Gestão de Contexto"]
+
+ORM["🗄️ ORM SQLAlchemy"]
+
+end
+
+subgraph DB["💾 Base de Dados"]
+DB1["SQLite (desenvolvimento)"]
+DB2["PostgreSQL (produção)"]
+DB3["12 tabelas"]
+end
+
+subgraph EXT["☁️ Serviço Externo"]
+G["Google Gemini API"]
+end
+
+FRONT -->|"HTTP/REST + JSON + JWT"| API
+
+API --> AUTH
+API --> SCORING
+API --> REPORT
+API --> IA
+
+SCORING --> ORM
+ORM --> DB
+
+IA --> G
 ```
 
 ---
