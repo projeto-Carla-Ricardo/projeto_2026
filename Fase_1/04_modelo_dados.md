@@ -40,209 +40,59 @@ C -->|"1:N"| I
 
 ## 2. Esquema SQL (SQLite/PostgreSQL)
 
-```sql
--- ══════════════════════════════════════════════════════════
--- UTILIZADORES
--- ══════════════════════════════════════════════════════════
-CREATE TABLE utilizadores (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome            TEXT NOT NULL,
-    email           TEXT NOT NULL UNIQUE,
-    password_hash   TEXT NOT NULL,
-    papel           TEXT NOT NULL DEFAULT 'utilizador' CHECK(papel IN ('utilizador', 'admin')),
-    ativo           BOOLEAN DEFAULT 1,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+```mermaid
+flowchart TB
 
--- ══════════════════════════════════════════════════════════
--- ORGANIZAÇÕES
--- ══════════════════════════════════════════════════════════
-CREATE TABLE organizacoes (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id         INTEGER NOT NULL REFERENCES utilizadores(id),
-    nome            TEXT NOT NULL,
-    setor           TEXT NOT NULL,              -- ex: 'Educação', 'Retalho', 'Tecnologia', 'Saúde'
-    dimensao        TEXT NOT NULL,              -- 'micro', 'pequena', 'media', 'grande'
-    tipo            TEXT NOT NULL,              -- 'mpe', 'pme', 'grande_empresa', 'ensino_superior'
-    pais            TEXT DEFAULT 'Portugal',
-    descricao       TEXT,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+subgraph UI["🎨 Frontend"]
+    F1["Interface Web"]
+    F2["Questionário AILO"]
+    F3["Dashboard"]
+    F4["Chat IA"]
+end
 
--- ══════════════════════════════════════════════════════════
--- FRAMEWORK AILO — CAMADAS
--- ══════════════════════════════════════════════════════════
-CREATE TABLE camadas_ailo (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome            TEXT NOT NULL,               -- 'Organizacional', 'Humana', etc.
-    nome_en         TEXT NOT NULL,               -- 'Organizational', 'Human', etc.
-    descricao       TEXT NOT NULL,
-    peso            REAL NOT NULL DEFAULT 1.0,   -- Peso no cálculo global
-    ordem           INTEGER NOT NULL,            -- Posição no questionário (1-6)
-    cor             TEXT DEFAULT '#2E4057',       -- Cor no dashboard hexagonal
-    icone           TEXT                          -- Nome do ícone
-);
+subgraph API["⚙️ Backend API"]
+    B1["Autenticação JWT"]
+    B2["Gestão de Utilizadores"]
+    B3["Motor de Scoring"]
+    B4["Geração de Relatórios"]
+    B5["Lógica AILO"]
+end
 
--- ══════════════════════════════════════════════════════════
--- COMPONENTES (sub-elementos de cada camada)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE componentes (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    camada_id       INTEGER NOT NULL REFERENCES camadas_ailo(id),
-    nome            TEXT NOT NULL,               -- 'Estratégia', 'Pessoas', etc.
-    nome_en         TEXT NOT NULL,
-    descricao       TEXT,
-    peso            REAL NOT NULL DEFAULT 1.0,
-    ordem           INTEGER NOT NULL
-);
+subgraph DB["🗄️ Base de Dados"]
+    D1["Utilizadores"]
+    D2["Organizações"]
+    D3["Avaliações"]
+    D4["Respostas"]
+    D5["Resultados"]
+end
 
--- ══════════════════════════════════════════════════════════
--- INDICADORES (perguntas do questionário)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE indicadores (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    componente_id   INTEGER NOT NULL REFERENCES componentes(id),
-    codigo          TEXT NOT NULL UNIQUE,         -- 'O.E.1', 'H.P.1', etc.
-    pergunta        TEXT NOT NULL,                -- Texto da pergunta no questionário
-    descricao       TEXT,                         -- Explicação expandida do indicador
-    desc_nivel_1    TEXT NOT NULL,                -- Descrição do nível 1 (Inicial)
-    desc_nivel_2    TEXT,                         -- Descrição do nível 2
-    desc_nivel_3    TEXT NOT NULL,                -- Descrição do nível 3 (Definido)
-    desc_nivel_4    TEXT,                         -- Descrição do nível 4
-    desc_nivel_5    TEXT NOT NULL,                -- Descrição do nível 5 (Otimizado)
-    peso            REAL NOT NULL DEFAULT 1.0,
-    obrigatorio     BOOLEAN DEFAULT 1,
-    condicao        TEXT,                         -- Condição para mostrar (JSON: {"campo": "tipo", "valor": "ensino_superior"})
-    ordem           INTEGER NOT NULL
-);
+subgraph AI["🤖 Serviço IA"]
+    A1["Explicações"]
+    A2["Sugestões"]
+    A3["Validação"]
+    A4["Análise Contextual"]
+end
 
--- ══════════════════════════════════════════════════════════
--- AVALIAÇÕES (instâncias de diagnóstico)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE avaliacoes (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    organizacao_id  INTEGER NOT NULL REFERENCES organizacoes(id),
-    user_id         INTEGER NOT NULL REFERENCES utilizadores(id),
-    data_inicio     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_fim        TIMESTAMP,
-    status          TEXT NOT NULL DEFAULT 'em_curso' CHECK(status IN ('em_curso', 'completa', 'cancelada')),
-    score_global    REAL,                        -- Calculado ao finalizar
-    nivel_global    TEXT,                         -- 'Inicial', 'Em Desenvolvimento', etc.
-    notas           TEXT,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+subgraph EXT["🌐 Serviços Externos"]
+    E1["Email SMTP"]
+    E2["Exportação PDF"]
+end
 
--- ══════════════════════════════════════════════════════════
--- RESPOSTAS (uma por indicador por avaliação)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE respostas (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id),
-    indicador_id    INTEGER NOT NULL REFERENCES indicadores(id),
-    score           INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
-    justificacao    TEXT,                         -- Texto livre opcional do utilizador
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(avaliacao_id, indicador_id)
-);
+F1 --> B1
+F2 --> B3
+F3 --> B4
+F4 --> A1
 
--- ══════════════════════════════════════════════════════════
--- RESULTADOS POR CAMADA (calculados pelo motor de scoring)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE resultados_camada (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id),
-    camada_id       INTEGER NOT NULL REFERENCES camadas_ailo(id),
-    score           REAL NOT NULL,               -- Score calculado (1.0-5.0)
-    nivel           TEXT NOT NULL,                -- Nível de maturidade
-    pontos_fortes   TEXT,                         -- JSON array de pontos fortes
-    lacunas         TEXT,                         -- JSON array de lacunas
-    recomendacoes   TEXT,                         -- JSON array de recomendações
-    cr_mapeamento   TEXT,                         -- JSON: CRs relevantes para esta camada
-    UNIQUE(avaliacao_id, camada_id)
-);
+B1 --> D1
+B2 --> D2
+B3 --> D3
+B3 --> D4
+B4 --> D5
 
--- ══════════════════════════════════════════════════════════
--- INTERDEPENDÊNCIAS ENTRE CAMADAS
--- ══════════════════════════════════════════════════════════
-CREATE TABLE interdependencias (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id),
-    camada_a_id     INTEGER NOT NULL REFERENCES camadas_ailo(id),
-    camada_b_id     INTEGER NOT NULL REFERENCES camadas_ailo(id),
-    tipo_relacao    TEXT NOT NULL,                -- 'fortalece', 'bloqueia', 'risco', 'oportunidade'
-    descricao       TEXT NOT NULL,
-    impacto         TEXT NOT NULL CHECK(impacto IN ('alto', 'medio', 'baixo')),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+B5 --> AI
 
--- ══════════════════════════════════════════════════════════
--- CATÁLOGO DE FERRAMENTAS IA
--- ══════════════════════════════════════════════════════════
-CREATE TABLE ferramentas_ia (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome            TEXT NOT NULL,
-    descricao       TEXT NOT NULL,
-    camada_id       INTEGER REFERENCES camadas_ailo(id),  -- Camada AILO principal
-    area_funcional  TEXT NOT NULL,                -- 'aprendizagem', 'analytics', 'automacao', 'comunicacao'
-    custo           TEXT NOT NULL CHECK(custo IN ('gratuito', 'freemium', 'pago')),
-    complexidade    TEXT NOT NULL CHECK(complexidade IN ('baixa', 'media', 'alta')),
-    url             TEXT,
-    ativo           BOOLEAN DEFAULT 1,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ══════════════════════════════════════════════════════════
--- RECOMENDAÇÕES (ferramentas recomendadas por avaliação)
--- ══════════════════════════════════════════════════════════
-CREATE TABLE recomendacoes (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id),
-    ferramenta_id   INTEGER NOT NULL REFERENCES ferramentas_ia(id),
-    camada_id       INTEGER NOT NULL REFERENCES camadas_ailo(id),
-    prioridade      INTEGER NOT NULL DEFAULT 1,   -- 1=mais prioritário
-    justificacao    TEXT,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ══════════════════════════════════════════════════════════
--- RELATÓRIOS GERADOS
--- ══════════════════════════════════════════════════════════
-CREATE TABLE relatorios (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id) UNIQUE,
-    titulo          TEXT NOT NULL,
-    conteudo_json   TEXT NOT NULL,                -- JSON com dados estruturados do relatório
-    pdf_path        TEXT,                         -- Caminho para ficheiro PDF gerado
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ══════════════════════════════════════════════════════════
--- CONVERSAS COM ASSISTENTE IA
--- ══════════════════════════════════════════════════════════
-CREATE TABLE conversas_ia (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    avaliacao_id    INTEGER NOT NULL REFERENCES avaliacoes(id),
-    papel           TEXT NOT NULL CHECK(papel IN ('user', 'assistant', 'system')),
-    mensagem        TEXT NOT NULL,
-    camada_id       INTEGER REFERENCES camadas_ailo(id),  -- Contexto da camada (se aplicável)
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ══════════════════════════════════════════════════════════
--- ÍNDICES
--- ══════════════════════════════════════════════════════════
-CREATE INDEX idx_organizacoes_user ON organizacoes(user_id);
-CREATE INDEX idx_avaliacoes_org ON avaliacoes(organizacao_id);
-CREATE INDEX idx_avaliacoes_user ON avaliacoes(user_id);
-CREATE INDEX idx_respostas_avaliacao ON respostas(avaliacao_id);
-CREATE INDEX idx_respostas_indicador ON respostas(indicador_id);
-CREATE INDEX idx_componentes_camada ON componentes(camada_id);
-CREATE INDEX idx_indicadores_componente ON indicadores(componente_id);
-CREATE INDEX idx_resultados_avaliacao ON resultados_camada(avaliacao_id);
-CREATE INDEX idx_conversas_avaliacao ON conversas_ia(avaliacao_id);
+B4 --> E2
+B1 --> E1
 ```
 
 ---
