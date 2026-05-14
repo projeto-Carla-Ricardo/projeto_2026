@@ -101,14 +101,34 @@ B1 --> E1
 
 ### 3.1. Camadas AILO
 
-```sql
-INSERT INTO camadas_ailo (nome, nome_en, descricao, peso, ordem, cor) VALUES
-('Organizacional', 'Organizational', 'Liga a aprendizagem organizacional à estratégia, processos, decisão e criação de valor.', 1.0, 1, '#2E4057'),
-('Humana', 'Human', 'Fundação da aprendizagem: pessoas, cultura, autonomia e ética.', 1.2, 2, '#048A81'),
-('Aprendizagem', 'Learning', 'Contextos, experiências e processos de aprendizagem organizacional.', 1.0, 3, '#54C6EB'),
-('Cognitiva (IA)', 'Cognitive (AI)', 'IA como mediador cognitivo: geração, recomendação, síntese e previsão.', 1.0, 4, '#8EE3EF'),
-('Tecnológica', 'Technological', 'Infraestrutura que suporta o ecossistema AILO.', 0.8, 5, '#7C77B9'),
-('Avaliação', 'Evaluation', 'Processo contínuo e formativo que fecha o ciclo de aprendizagem.', 1.0, 6, '#E8567F');
+```mermaid
+flowchart TB
+
+O["🏢 Camada Organizacional<br/>Estratégia<br/>Processos<br/>Decisão<br/>Valor"]
+
+H["👥 Camada Humana<br/>Pessoas<br/>Cultura<br/>Autonomia<br/>Ética"]
+
+A["📚 Camada de Aprendizagem<br/>Contextos Adaptativos<br/>Experiências Personalizadas<br/>Integração Formal-Informal"]
+
+C["🤖 Camada Cognitiva (IA)<br/>Geração<br/>Recomendação<br/>Síntese<br/>Previsão"]
+
+T["💻 Camada Tecnológica<br/>Plataformas<br/>Dados<br/>Integração<br/>Segurança"]
+
+V["📈 Camada de Avaliação<br/>Evidência<br/>Feedback<br/>Competências<br/>Impacto Organizacional"]
+
+CORE["🧠 AILO CORE<br/>Conhecimento Organizacional"]
+
+O --> CORE
+H --> CORE
+A --> CORE
+C --> CORE
+T --> CORE
+V --> CORE
+
+T --> C
+H --> A
+O --> V
+C --> V
 ```
 
 ### 3.2. Componentes (exemplo — Camada Organizacional)
