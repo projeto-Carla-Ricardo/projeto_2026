@@ -3,85 +3,37 @@
 ## 1. Diagrama Entidade-Relacionamento (Textual)
 
 ```
-┌──────────────┐       ┌──────────────┐       ┌──────────────┐
-│ utilizadores │──1:N──│ organizacoes │──1:N──│  avaliacoes  │
-│              │       │              │       │              │
-│ id           │       │ id           │       │ id           │
-│ nome         │       │ nome         │       │ org_id (FK)  │
-│ email        │       │ setor        │       │ user_id (FK) │
-│ password_hash│       │ dimensao     │       │ data_inicio  │
-│ papel        │       │ tipo         │       │ data_fim     │
-│ created_at   │       │ pais         │       │ status       │
-│ updated_at   │       │ descricao    │       │ score_global │
-└──────────────┘       │ user_id (FK) │       │ nivel_global │
-                       │ created_at   │       │ created_at   │
-                       └──────────────┘       └──────┬───────┘
-                                                     │
-                                                     │ 1:N
-                                                     ▼
-┌──────────────┐       ┌──────────────┐       ┌──────────────┐
-│ camadas_ailo │──1:N──│ componentes  │──1:N──│ indicadores  │
-│              │       │              │       │              │
-│ id           │       │ id           │       │ id           │
-│ nome         │       │ camada_id(FK)│       │ comp_id (FK) │
-│ nome_en      │       │ nome         │       │ codigo       │
-│ descricao    │       │ nome_en      │       │ pergunta     │
-│ peso         │       │ descricao    │       │ desc_nivel_1 │
-│ ordem        │       │ peso         │       │ desc_nivel_3 │
-│ cor          │       │ ordem        │       │ desc_nivel_5 │
-└──────────────┘       └──────────────┘       │ peso         │
-                                              │ obrigatorio  │
-                                              │ ordem        │
-                                              └──────┬───────┘
-                                                     │
-                                              ┌──────┴───────┐
-                                              │   respostas  │
-                                              │              │
-                                              │ id           │
-                                              │ avaliacao_id │
-                                              │ indicador_id │
-                                              │ score        │
-                                              │ justificacao │
-                                              │ created_at   │
-                                              └──────────────┘
+flowchart TB
 
-┌────────────────────┐       ┌────────────────────┐
-│ resultados_camada  │       │ interdependencias  │
-│                    │       │                    │
-│ id                 │       │ id                 │
-│ avaliacao_id (FK)  │       │ avaliacao_id (FK)  │
-│ camada_id (FK)     │       │ camada_a_id (FK)   │
-│ score              │       │ camada_b_id (FK)   │
-│ nivel              │       │ tipo_relacao       │
-│ pontos_fortes      │       │ descricao          │
-│ lacunas            │       │ impacto            │
-│ recomendacoes      │       │ created_at         │
-└────────────────────┘       └────────────────────┘
+U["UTILIZADORES<br/>id (PK)<br/>nome<br/>email<br/>password_hash<br/>papel<br/>created_at<br/>updated_at"]
 
-┌────────────────────┐       ┌────────────────────┐
-│  ferramentas_ia    │       │  recomendacoes     │
-│                    │       │                    │
-│ id                 │       │ id                 │
-│ nome               │       │ avaliacao_id (FK)  │
-│ descricao          │       │ ferramenta_id (FK) │
-│ camada_id (FK)     │       │ camada_id (FK)     │
-│ area_funcional     │       │ prioridade         │
-│ custo              │       │ justificacao       │
-│ complexidade       │       │ created_at         │
-│ url                │       └────────────────────┘
-│ ativo              │
-└────────────────────┘
+O["ORGANIZACOES<br/>id (PK)<br/>user_id (FK)<br/>nome<br/>setor<br/>dimensao<br/>tipo<br/>pais<br/>descricao"]
 
-┌────────────────────┐
-│ conversas_ia       │
-│                    │
-│ id                 │
-│ avaliacao_id (FK)  │
-│ papel              │
-│ mensagem           │
-│ camada_id (FK)     │
-│ created_at         │
-└────────────────────┘
+A["AVALIACOES<br/>id (PK)<br/>organizacao_id (FK)<br/>user_id (FK)<br/>data_inicio<br/>data_fim<br/>status<br/>score_global<br/>nivel_global"]
+
+R["RESPOSTAS<br/>id (PK)<br/>avaliacao_id (FK)<br/>indicador_id (FK)<br/>score<br/>justificacao"]
+
+RC["RESULTADOS_CAMADA<br/>id (PK)<br/>avaliacao_id (FK)<br/>camada_id (FK)<br/>score<br/>nivel"]
+
+CI["CONVERSAS_IA<br/>id (PK)<br/>avaliacao_id (FK)<br/>mensagem<br/>papel<br/>camada_id (FK)"]
+
+I["INDICADORES<br/>id<br/>componente_id (FK)<br/>codigo<br/>pergunta<br/>peso"]
+
+C["COMPONENTES<br/>id<br/>camada_id (FK)<br/>nome<br/>peso"]
+
+CA["CAMADAS_AILO<br/>id<br/>nome<br/>peso"]
+
+U -->|"1:N"| O
+O -->|"1:N"| A
+
+A -->|"1:N"| R
+A -->|"1:N"| RC
+A -->|"1:N"| CI
+
+I -->|"1:N"| R
+
+CA -->|"1:N"| C
+C -->|"1:N"| I
 ```
 
 ---
