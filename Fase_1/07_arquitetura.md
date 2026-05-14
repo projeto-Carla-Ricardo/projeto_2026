@@ -220,30 +220,21 @@ G --> P
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
-```
-    Dados da avaliação completa
-            │
-            ▼
-    ┌───────────────────────┐
-    │  Template do relatório│
-    │                       │
-    │  1. Capa              │
-    │  2. Resumo Executivo  │
-    │  3. Perfil Org.       │
-    │  4. Diagnóstico x6    │
-    │     camadas           │
-    │  5. Interdependências │
-    │  6. CRs relevantes    │
-    │  7. Recomendações     │
-    │  8. Roteiro           │
-    └──────────┬────────────┘
-               │
-          ┌────┴────┐
-          ▼         ▼
-    ┌──────────┐ ┌──────────┐
-    │ Web View │ │  PDF     │
-    │ (HTML)   │ │ Download │
-    └──────────┘ └──────────┘
+```mermaid
+flowchart TB
+
+D["Dados da avaliação completa"]
+
+T["Template do relatório<br/><br/>1. Capa<br/>2. Resumo Executivo<br/>3. Perfil da Organização<br/>4. Diagnóstico das 6 camadas<br/>5. Interdependências<br/>6. CRs relevantes<br/>7. Recomendações<br/>8. Roteiro"]
+
+W["Web View<br/>(HTML)"]
+
+P["PDF<br/>Download"]
+
+D --> T
+
+T --> W
+T --> P
 ```
 
 ---
