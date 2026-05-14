@@ -233,7 +233,21 @@ G --> R
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
+```mermaid
+flowchart TB
 
+D["Dados da avaliação completa"]
+
+T["Template do relatório<br/>1. Capa<br/>2. Resumo Executivo<br/>3. Perfil da Organização<br/>4. Diagnóstico das 6 camadas<br/>5. Interdependências<br/>6. CRs relevantes<br/>7. Recomendações<br/>8. Roteiro de Implementação"]
+
+W["Web View<br/>(HTML)"]
+
+P["PDF<br/>Download"]
+
+D --> T
+
+T --> W
+T --> P
 
 ---
 
