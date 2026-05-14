@@ -2,64 +2,45 @@
 
 ## 1. Mapa de Navegação
 
-```
-                            ┌──────────────┐
-                            │ Landing Page │
-                            └──────┬───────┘
-                                   │
-                          ┌────────┴────────┐
-                          ▼                 ▼
-                   ┌──────────┐      ┌──────────┐
-                   │  Login   │      │ Registo  │
-                   └────┬─────┘      └────┬─────┘
-                        │                 │
-                        └────────┬────────┘
-                                 ▼
-                        ┌────────────────┐
-                        │   Dashboard    │
-                        │   Principal    │
-                        └───────┬────────┘
-                                │
-              ┌─────────┬───────┼───────┬──────────┐
-              ▼         ▼       ▼       ▼          ▼
-        ┌──────────┐ ┌─────┐ ┌──────┐ ┌─────┐ ┌──────┐
-        │Organizaç.│ │Nova │ │Histór│ │Perfil│ │Admin │
-        │ Lista    │ │Aval.│ │ico   │ │      │ │Panel │
-        └────┬─────┘ └──┬──┘ └──┬───┘ └──────┘ └──────┘
-             │          │       │
-             │          ▼       │
-             │   ┌─────────────────────────────────┐
-             │   │       QUESTIONÁRIO AILO          │
-             │   │                                  │
-             │   │  Tab 1: Organizacional           │
-             │   │  Tab 2: Humana                   │
-             │   │  Tab 3: Aprendizagem             │
-             │   │  Tab 4: Cognitiva (IA)           │
-             │   │  Tab 5: Tecnológica              │
-             │   │  Tab 6: Avaliação                │
-             │   │                   ┌────────────┐ │
-             │   │                   │  Chat IA   │ │
-             │   │                   │  Lateral   │ │
-             │   │                   └────────────┘ │
-             │   └────────────┬────────────────────┘
-             │                │
-             │                ▼
-             │   ┌─────────────────────────────────┐
-             │   │       RESULTADOS                 │
-             │   │                                  │
-             │   │  ┌──────────┐ ┌──────────────┐  │
-             │   │  │Dashboard │ │ Relatório    │  │
-             │   │  │Hexagonal │ │ Detalhado    │  │
-             │   │  └──────────┘ └──────────────┘  │
-             │   │  ┌──────────┐ ┌──────────────┐  │
-             │   │  │Interdep. │ │ Recomendações│  │
-             │   │  └──────────┘ └──────────────┘  │
-             │   │              ┌──────────────┐   │
-             │   │              │  PDF Export   │   │
-             │   │              └──────────────┘   │
-             │   └─────────────────────────────────┘
-             │
-             └──────▶ Comparação temporal
+```mermaid
+flowchart TB
+
+LP["Landing Page"]
+
+LOGIN["Login"]
+REG["Registo"]
+
+DP["Dashboard Principal"]
+
+ORG["Organizações<br/>Lista"]
+NOVA["Nova<br/>Avaliação"]
+HIST["Histórico"]
+PERFIL["Perfil"]
+ADMIN["Admin Panel"]
+
+Q["QUESTIONÁRIO AILO<br/><br/>Tab 1: Organizacional<br/>Tab 2: Humana<br/>Tab 3: Aprendizagem<br/>Tab 4: Cognitiva (IA)<br/>Tab 5: Tecnológica<br/>Tab 6: Avaliação<br/><br/>+ Chat IA Lateral"]
+
+R["RESULTADOS<br/><br/>Dashboard Hexagonal<br/>Relatório Detalhado<br/>Interdependências<br/>Recomendações<br/>PDF Export"]
+
+COMP["Comparação temporal"]
+
+LP --> LOGIN
+LP --> REG
+
+LOGIN --> DP
+REG --> DP
+
+DP --> ORG
+DP --> NOVA
+DP --> HIST
+DP --> PERFIL
+DP --> ADMIN
+
+NOVA --> Q
+
+Q --> R
+
+ORG --> COMP
 ```
 
 ---
@@ -68,267 +49,218 @@
 
 ### 2.1. Landing Page
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│  🔷 AILO Platform                                  [Login] [Registar] │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│              Avalie a maturidade da sua organização                    │
-│              com o Framework AILO                                      │
-│                                                                        │
-│     A IA como mediador cognitivo nas Organizações Aprendentes         │
-│                                                                        │
-│                    [ Começar Avaliação →  ]                            │
-│                                                                        │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│   ┌────────────┐    ┌────────────┐    ┌────────────┐                  │
-│   │ 🏢         │    │ 🤖         │    │ 📊         │                  │
-│   │ 6 Camadas  │    │ Assistente │    │ Relatórios │                  │
-│   │ AILO       │    │ IA         │    │ Detalhados │                  │
-│   │            │    │            │    │            │                  │
-│   │ Avaliação  │    │ Ajuda-o a  │    │ Diagnóstico│                  │
-│   │ integrada  │    │ compreender│    │ por camada │                  │
-│   │ de todas   │    │ cada       │    │ com        │                  │
-│   │ as camadas │    │ conceito   │    │ recomend.  │                  │
-│   └────────────┘    └────────────┘    └────────────┘                  │
-│                                                                        │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│              [Figura 1 — Hexágono AILO]                               │
-│                                                                        │
-│        O framework AILO organiza-se em 6 camadas:                     │
-│                                                                        │
-│        • Organizacional — Estratégia e governação                     │
-│        • Humana — Pessoas, cultura e ética                            │
-│        • Aprendizagem — Contextos e experiências                      │
-│        • Cognitiva (IA) — Geração, recomendação, síntese, previsão   │
-│        • Tecnológica — Infraestrutura e dados                         │
-│        • Avaliação — Ciclo de melhoria contínua                       │
-│                                                                        │
-├────────────────────────────────────────────────────────────────────────┤
-│  © 2026 Projeto AILO — Engenharia Informática — UAb                  │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+TOP["🔷 AILO Platform<br/><br/>[ Login ]  [ Registar ]"]
+
+TITLE["Avalie a maturidade da sua organização<br/>com o Framework AILO"]
+
+SUB["A IA como mediador cognitivo nas Organizações Aprendentes"]
+
+BTN["▶ Começar Avaliação"]
+
+subgraph FEATURES["Funcionalidades"]
+
+F1["🏢<br/><b>6 Camadas AILO</b><br/><br/>Avaliação integrada<br/>de todas as camadas"]
+
+F2["🤖<br/><b>Assistente IA</b><br/><br/>Ajuda a compreender<br/>cada conceito"]
+
+F3["📊<br/><b>Relatórios Detalhados</b><br/><br/>Diagnóstico por camada<br/>com recomendações"]
+
+end
+
+HEX["Figura 1 — Hexágono AILO"]
+
+LAYERS["• Organizacional — Estratégia e governação<br/>• Humana — Pessoas, cultura e ética<br/>• Aprendizagem — Contextos e experiências<br/>• Cognitiva (IA) — Geração, recomendação, síntese e previsão<br/>• Tecnológica — Infraestrutura e dados<br/>• Avaliação — Ciclo de melhoria contínua"]
+
+FOOT["© 2026 Projeto AILO — Engenharia Informática — UAb"]
+
+TOP --> TITLE
+TITLE --> SUB
+SUB --> BTN
+
+BTN --> FEATURES
+
+FEATURES --> HEX
+
+HEX --> LAYERS
+
+LAYERS --> FOOT
 ```
 
 ### 2.2. Dashboard Principal (após login)
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│  🔷 AILO    [Organizações] [Avaliações] [Perfil]        Ricardo ▾    │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│  Bem-vindo, Ricardo                                                    │
-│                                                                        │
-│  ┌───────────────────────────┐  ┌───────────────────────────┐         │
-│  │  📋 Minhas Organizações   │  │  📊 Últimas Avaliações    │         │
-│  │                           │  │                           │         │
-│  │  TechSchool    [Avaliar]  │  │  TechSchool  3.2/5  ██▓░ │         │
-│  │  MicroRetail   [Avaliar]  │  │  19/04/2026  Definido    │         │
-│  │                           │  │                           │         │
-│  │  [+ Nova Organização]     │  │  MicroRetail  Em curso... │         │
-│  └───────────────────────────┘  └───────────────────────────┘         │
-│                                                                        │
-│  ┌──────────────────────────────────────────────────────────┐         │
-│  │  Avaliação mais recente: TechSchool                      │         │
-│  │                                                          │         │
-│  │          ┌─────────────┐                                 │         │
-│  │          │ Organiz.    │                                 │         │
-│  │          │   3.5       │                                 │         │
-│  │     ┌────┤             ├────┐                            │         │
-│  │     │Hum.│             │Apr.│                            │         │
-│  │     │3.8 │  AILO 3.2   │2.9 │   ← Hexágono/Radar       │         │
-│  │     └────┤             ├────┘                            │         │
-│  │          │             │                                 │         │
-│  │     ┌────┤             ├────┐                            │         │
-│  │     │Aval│             │Cog.│                            │         │
-│  │     │3.1 │             │2.7 │                            │         │
-│  │     └────┤             ├────┘                            │         │
-│  │          │ Tecnol.     │                                 │         │
-│  │          │   3.3       │                                 │         │
-│  │          └─────────────┘                                 │         │
-│  │                                                          │         │
-│  │  [Ver Detalhes]  [Gerar PDF]  [Ver Recomendações]       │         │
-│  └──────────────────────────────────────────────────────────┘         │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+TOP["🔷 AILO<br/>[Organizações] [Avaliações] [Perfil]<br/>Ricardo ▾"]
+
+WELCOME["Bem-vindo, Ricardo"]
+
+subgraph INFO["Painel Principal"]
+
+ORG["📋 Minhas Organizações<br/><br/>TechSchool [Avaliar]<br/>MicroRetail [Avaliar]<br/><br/>+ Nova Organização"]
+
+AV["📊 Últimas Avaliações<br/><br/>TechSchool — 3.2/5 — Definido<br/>19/04/2026<br/><br/>MicroRetail — Em curso..."]
+
+end
+
+subgraph DASH["Avaliação mais recente: TechSchool"]
+
+HEX["Hexágono/Radar AILO<br/><br/>Organizacional: 3.5<br/>Humana: 3.8<br/>Aprendizagem: 2.9<br/>Cognitiva: 2.7<br/>Tecnológica: 3.3<br/>Avaliação: 3.1<br/><br/>AILO Global: 3.2"]
+
+BTN["[ Ver Detalhes ]<br/>[ Gerar PDF ]<br/>[ Ver Recomendações ]"]
+
+end
+
+TOP --> WELCOME
+
+WELCOME --> INFO
+
+INFO --> DASH
+
+HEX --> BTN
 ```
 
 ### 2.3. Questionário AILO
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│  🔷 AILO    Avaliação: TechSchool           Progresso: ████░░ 67%    │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│  ┌─ CAMADAS ──────────────────────────────────────────────────────┐   │
-│  │ ✅ Organiz. │ ✅ Humana │ 🔵 Aprendiz. │ ○ Cogn. │ ○ Tecn. │ ○ Aval │
-│  └────────────────────────────────────────────────────────────────┘   │
-│                                                                        │
-│  ┌──────────────────────────────────────────┐ ┌──────────────────────┐│
-│  │                                          │ │  💬 Assistente AILO  ││
-│  │  Camada de Aprendizagem                  │ │                      ││
-│  │  ━━━━━━━━━━━━━━━━━━━━━━                  │ │  Olá! Estamos na     ││
-│  │                                          │ │  Camada de           ││
-│  │  📌 Contextos Adaptativos                │ │  Aprendizagem.       ││
-│  │                                          │ │  Esta camada avalia  ││
-│  │  A.C.1 — Personalização de percursos     │ │  como a organização  ││
-│  │  ┌─────────────────────────────────────┐ │ │  cria ambientes de   ││
-│  │  │ Qual o nível de personalização dos  │ │ │  aprendizagem        ││
-│  │  │ percursos de aprendizagem?          │ │ │  adaptativos.        ││
-│  │  │                                     │ │ │                      ││
-│  │  │  ○ 1 - One-size-fits-all            │ │ │  Pergunte-me         ││
-│  │  │  ○ 2 - Alguma diferenciação         │ │ │  qualquer dúvida!    ││
-│  │  │  ● 3 - Percursos por perfil/função  │ │ │                      ││
-│  │  │  ○ 4 - Adaptação parcial por IA     │ │ │ ┌──────────────────┐ ││
-│  │  │  ○ 5 - IA gera percursos adaptativ. │ │ │ │ O que são       │ ││
-│  │  │                                     │ │ │ │ contextos       │ ││
-│  │  │  Justificação (opcional):           │ │ │ │ adaptativos?    │ ││
-│  │  │  ┌────────────────────────────────┐ │ │ │ └────────┬─────────┘ ││
-│  │  │  │ Temos percursos por função... │ │ │ │          │           ││
-│  │  │  └────────────────────────────────┘ │ │ │ Contextos adaptativos││
-│  │  │                           [?] Ajuda │ │ │ são ambientes de     ││
-│  │  └─────────────────────────────────────┘ │ │ aprendizagem que se  ││
-│  │                                          │ │ ajustam ao perfil,   ││
-│  │  A.C.2 — Ambientes de aprendizagem       │ │ função e necessidades││
-│  │  ┌─────────────────────────────────────┐ │ │ de cada aprendente.  ││
-│  │  │ ...                                 │ │ │ Na sua escola, isto  ││
-│  │  └─────────────────────────────────────┘ │ │ poderia significar...││
-│  │                                          │ │                      ││
-│  │  📌 Experiências Personalizadas          │ │ ┌──────────────────┐ ││
-│  │  ...                                     │ │ │ Escreva aqui...  │ ││
-│  │                                          │ │ └────────┬─────────┘ ││
-│  │  [← Camada Anterior]  [Próxima Camada →] │ │          [Enviar]    ││
-│  └──────────────────────────────────────────┘ └──────────────────────┘│
-│                                                                        │
-│  Auto-save ativo ✓                          Última gravação: 18:45   │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+TOP["🔷 AILO<br/>Avaliação: TechSchool<br/>Progresso: 67%"]
+
+LAYERS["✅ Organizacional | ✅ Humana | 🔵 Aprendizagem | ○ Cognitiva | ○ Tecnológica | ○ Avaliação"]
+
+subgraph MAIN["QUESTIONÁRIO AILO"]
+
+subgraph LEFT["Questionário"]
+
+TITLE["Camada de Aprendizagem"]
+
+COMP["📌 Contextos Adaptativos"]
+
+Q1["A.C.1 — Personalização de percursos<br/><br/>Qual o nível de personalização dos percursos de aprendizagem?<br/><br/>○ 1 — One-size-fits-all<br/>○ 2 — Alguma diferenciação<br/>● 3 — Percursos por perfil/função<br/>○ 4 — Adaptação parcial por IA<br/>○ 5 — IA gera percursos adaptativos"]
+
+JUST["Justificação:<br/>Temos percursos por função..."]
+
+Q2["A.C.2 — Ambientes de aprendizagem<br/>..."]
+
+COMP2["📌 Experiências Personalizadas"]
+
+NAV["[← Camada Anterior]  [Próxima Camada →]"]
+
+end
+
+subgraph RIGHT["💬 Assistente AILO"]
+
+HELP["Olá! Estamos na Camada de Aprendizagem.<br/><br/>Esta camada avalia como a organização cria ambientes de aprendizagem adaptativos."]
+
+USER["O que são contextos adaptativos?"]
+
+BOT["Contextos adaptativos são ambientes de aprendizagem que se ajustam ao perfil, função e necessidades de cada aprendente."]
+
+INPUT["Escreva aqui..."]
+
+SEND["[Enviar]"]
+
+end
+
+end
+
+BOTTOM["Auto-save ativo ✓<br/>Última gravação: 18:45"]
+
+TOP --> LAYERS
+LAYERS --> MAIN
+MAIN --> BOTTOM
+
+TITLE --> COMP
+COMP --> Q1
+Q1 --> JUST
+JUST --> Q2
+Q2 --> COMP2
+COMP2 --> NAV
+
+HELP --> USER
+USER --> BOT
+BOT --> INPUT
+INPUT --> SEND
 ```
 
 ### 2.4. Dashboard de Resultados
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│  🔷 AILO    Resultados: TechSchool          [Gerar PDF] [Partilhar]  │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│  ┌───────────────────────────────────────────────────────────────────┐│
-│  │  Índice Global AILO: 3.2 / 5.0                                   ││
-│  │  Classificação: ██████████████████████░░░░░░░░  DEFINIDO          ││
-│  │                                                                   ││
-│  │  A organização tem processos formais estabelecidos com             ││
-│  │  implementação consistente, mas com margem para otimização.       ││
-│  └───────────────────────────────────────────────────────────────────┘│
-│                                                                        │
-│  ┌────────────────────────────┐  ┌───────────────────────────────────┐│
-│  │                            │  │  Scores por Camada               ││
-│  │    [Gráfico Hexagonal]     │  │                                   ││
-│  │                            │  │  🟢 Humana         3.8  ████████░ ││
-│  │     Organiz. 3.5           │  │  🟢 Organizacional 3.5  ███████░░ ││
-│  │      /      \              │  │  🟡 Tecnológica    3.3  ██████░░░ ││
-│  │  Hum 3.8    Apr 2.9       │  │  🟡 Avaliação      3.1  ██████░░░ ││
-│  │     |  AILO  |            │  │  🟡 Aprendizagem   2.9  █████░░░░ ││
-│  │  Ava 3.1    Cog 2.7       │  │  🔴 Cognitiva(IA)  2.7  █████░░░░ ││
-│  │      \      /              │  │                                   ││
-│  │     Tecnol. 3.3            │  │                                   ││
-│  │                            │  └───────────────────────────────────┘│
-│  └────────────────────────────┘                                       │
-│                                                                        │
-│  ┌───────────────────────────────────────────────────────────────────┐│
-│  │  Interdependências Chave                                          ││
-│  │                                                                   ││
-│  │  ✅ Humana × Organizacional (fortalece)                           ││
-│  │     Boa maturidade humana suporta a estratégia organizacional     ││
-│  │                                                                   ││
-│  │  ⚠️ Cognitiva × Tecnológica (risco)                               ││
-│  │     Ambição cognitiva limitada por infraestrutura tecnológica     ││
-│  │                                                                   ││
-│  │  ⚠️ Avaliação × Cognitiva (risco) — CR5                           ││
-│  │     Avaliação insuficiente pode permitir bypass de conhecimento   ││
-│  └───────────────────────────────────────────────────────────────────┘│
-│                                                                        │
-│  ┌───────────────────────────────────────────────────────────────────┐│
-│  │  Top Recomendações                                                ││
-│  │                                                                   ││
-│  │  1. 🔴 Cognitiva: Implementar IA generativa para criação de      ││
-│  │     conteúdos de aprendizagem (ex: Google Gemini) — Custo: Free   ││
-│  │                                                                   ││
-│  │  2. 🟡 Aprendizagem: Criar percursos adaptativos por função      ││
-│  │     utilizando LXP com recomendação — Custo: Freemium             ││
-│  │                                                                   ││
-│  │  3. 🟡 Avaliação: Implementar learning analytics para feedback   ││
-│  │     contínuo — Custo: Integrado no LMS                            ││
-│  │                                                                   ││
-│  │  [Ver todas as recomendações →]                                   ││
-│  └───────────────────────────────────────────────────────────────────┘│
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+TOP["🔷 AILO<br/>Resultados: TechSchool<br/>[Gerar PDF] [Partilhar]"]
+
+GLOBAL["Índice Global AILO: 3.2 / 5.0<br/><br/>Classificação: DEFINIDO<br/><br/>A organização tem processos formais estabelecidos com implementação consistente, mas com margem para otimização."]
+
+subgraph MAIN["Resultados"]
+
+HEX["📊 Gráfico Hexagonal<br/><br/>Organizacional: 3.5<br/>Humana: 3.8<br/>Aprendizagem: 2.9<br/>Cognitiva (IA): 2.7<br/>Tecnológica: 3.3<br/>Avaliação: 3.1"]
+
+SCORES["📈 Scores por Camada<br/><br/>🟢 Humana — 3.8<br/>🟢 Organizacional — 3.5<br/>🟡 Tecnológica — 3.3<br/>🟡 Avaliação — 3.1<br/>🟡 Aprendizagem — 2.9<br/>🔴 Cognitiva (IA) — 2.7"]
+
+end
+
+subgraph INTER["🔗 Interdependências Chave"]
+
+I1["✅ Humana × Organizacional<br/>Boa maturidade humana suporta a estratégia organizacional"]
+
+I2["⚠️ Cognitiva × Tecnológica<br/>Ambição cognitiva limitada pela infraestrutura tecnológica"]
+
+I3["⚠️ Avaliação × Cognitiva (CR5)<br/>Avaliação insuficiente pode permitir bypass de conhecimento"]
+
+end
+
+subgraph REC["💡 Top Recomendações"]
+
+R1["🔴 Cognitiva<br/>Implementar IA generativa para criação de conteúdos"]
+
+R2["🟡 Aprendizagem<br/>Criar percursos adaptativos por função"]
+
+R3["🟡 Avaliação<br/>Implementar learning analytics para feedback contínuo"]
+
+BTN["[Ver todas as recomendações →]"]
+
+end
+
+TOP --> GLOBAL
+
+GLOBAL --> MAIN
+
+MAIN --> INTER
+
+INTER --> REC
+
+R1 --> BTN
+R2 --> BTN
+R3 --> BTN
 ```
 
 ### 2.5. Relatório PDF — Estrutura
 
-```
-┌─────────────────────────────────┐
-│                                 │
-│     DIAGNÓSTICO AILO            │
-│     ─────────────────           │
-│     TechSchool                  │
-│                                 │
-│     Abril 2026                  │
-│                                 │
-│     [Logo AILO hexágono]        │
-│                                 │
-├─────────────────────────────────┤  Página 1 — Capa
-│                                 │
-│  RESUMO EXECUTIVO               │
-│                                 │
-│  Índice Global: 3.2 (Definido)  │
-│  [Gráfico hexagonal]            │
-│                                 │
-│  Pontos fortes: Camada Humana,  │
-│  Organizacional                 │
-│                                 │
-│  Áreas prioritárias: Cognitiva, │
-│  Aprendizagem                   │
-│                                 │
-├─────────────────────────────────┤  Página 2 — Resumo
-│                                 │
-│  1. CAMADA ORGANIZACIONAL       │
-│     Score: 3.5 — Gerido         │
-│     [Barra de progresso]        │
-│                                 │
-│     Pontos fortes:              │
-│     • Estratégia alinhada       │
-│     • Processos de KM ativos    │
-│                                 │
-│     Lacunas:                    │
-│     • Governação IA formal      │
-│                                 │
-│     Recomendações:              │
-│     • Implementar framework     │
-│       de governação             │
-│                                 │
-├─────────────────────────────────┤  Páginas 3-8 — Uma por camada
-│  ...                            │
-│  (repete para cada camada)      │
-│                                 │
-├─────────────────────────────────┤
-│                                 │
-│  INTERDEPENDÊNCIAS              │
-│  [Tabela/Grafo de relações]     │
-│                                 │
-├─────────────────────────────────┤  Página 9
-│                                 │
-│  ROTEIRO DE IMPLEMENTAÇÃO       │
-│                                 │
-│  Prioridade 1 (imediato):       │
-│  • ...                          │
-│                                 │
-│  Prioridade 2 (curto prazo):    │
-│  • ...                          │
-│                                 │
-│  Prioridade 3 (médio prazo):    │
-│  • ...                          │
-│                                 │
-└─────────────────────────────────┘  Página 10 — Roteiro
+```mermaid
+flowchart TB
+
+CAPA["📘 Página 1 — Capa<br/><br/>DIAGNÓSTICO AILO<br/>TechSchool<br/>Abril 2026<br/><br/>[Logo AILO Hexágono]"]
+
+RESUMO["📄 Página 2 — Resumo Executivo<br/><br/>Índice Global: 3.2 (Definido)<br/>[Gráfico Hexagonal]<br/><br/>Pontos fortes:<br/>• Camada Humana<br/>• Organizacional<br/><br/>Áreas prioritárias:<br/>• Cognitiva<br/>• Aprendizagem"]
+
+CAMADA["📊 Páginas 3-8 — Diagnóstico por Camada<br/><br/>1. Camada Organizacional<br/>Score: 3.5 — Gerido<br/>[Barra de progresso]<br/><br/>Pontos fortes<br/>Lacunas<br/>Recomendações<br/><br/>↺ Repetido para as 6 camadas"]
+
+INTER["🔗 Página 9 — Interdependências<br/><br/>[Tabela/Grafo de relações]"]
+
+ROTEIRO["🛣️ Página 10 — Roteiro de Implementação<br/><br/>Prioridade 1 — Imediato<br/>Prioridade 2 — Curto prazo<br/>Prioridade 3 — Médio prazo"]
+
+CAPA --> RESUMO
+
+RESUMO --> CAMADA
+
+CAMADA --> INTER
+
+INTER --> ROTEIRO
 ```
 
 ---
