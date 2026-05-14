@@ -169,44 +169,64 @@ S --> UC20
 
 ## 4. Fluxo de Utilização Completo
 
-```
-  ┌──────────┐     ┌──────────┐     ┌─────────────┐     ┌──────────────┐
-  │  Registo  │────▶│  Login   │────▶│ Criar Org.  │────▶│ Iniciar      │
-  │           │     │          │     │             │     │ Avaliação    │
-  └──────────┘     └──────────┘     └─────────────┘     └──────┬───────┘
-                                                               │
-                                                               ▼
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                    QUESTIONÁRIO AILO                             │
-  │                                                                 │
-  │  ┌────────────┐  ┌────────────┐  ┌────────────┐                │
-  │  │ Camada 1   │──│ Camada 2   │──│ Camada 3   │──...──Camada 6 │
-  │  │ Organizac. │  │ Humana     │  │ Aprendizag.│                │
-  │  │            │  │            │  │            │                │
-  │  │ ┌────────┐ │  │ ┌────────┐ │  │ ┌────────┐ │                │
-  │  │ │Perguntas│ │  │ │Perguntas│ │  │ │Perguntas│ │                │
-  │  │ │(1-5)   │ │  │ │(1-5)   │ │  │ │(1-5)   │ │                │
-  │  │ └────────┘ │  │ └────────┘ │  │ └────────┘ │                │
-  │  └──────┬─────┘  └──────┬─────┘  └──────┬─────┘                │
-  │         │               │               │                      │
-  │         └───────────────┼───────────────┘                      │
-  │                   ┌─────┴─────┐                                │
-  │                   │ Chat IA   │  ← Sempre disponível           │
-  │                   │ lateral   │                                │
-  │                   └───────────┘                                │
-  └────────────────────────────┬────────────────────────────────────┘
-                               │
-                               ▼ Finalizar
-  ┌────────────────────────────────────────────────────────────────┐
-  │                    MOTOR DE SCORING                             │
-  │                                                                │
-  │  Indicadores → Componentes → Camadas → Índice Global          │
-  │  + Interdependências + Mapeamento CR1-CR6                      │
-  └────────────────────────────┬───────────────────────────────────┘
-                               │
-                               ▼
-  ┌───────────────┐     ┌──────────────┐     ┌──────────────┐
-  │   Dashboard   │     │  Relatório   │     │ Recomendações│
-  │   Hexagonal   │     │  PDF/Web     │     │ Ferramentas  │
-  └───────────────┘     └──────────────┘     └──────────────┘
+```mermaid
+flowchart TB
+
+R["Registo"]
+L["Início de Sessão"]
+O["Criar Organização"]
+I["Iniciar Avaliação"]
+
+R --> L
+L --> O
+O --> I
+
+subgraph Q["QUESTIONÁRIO AILO"]
+
+C1["Camada 1<br/>Organizacional"]
+C2["Camada 2<br/>Humana"]
+C3["Camada 3<br/>Aprendizagem"]
+C6["... Camada 6"]
+
+P1["Perguntas<br/>(1-5)"]
+P2["Perguntas<br/>(1-5)"]
+P3["Perguntas<br/>(1-5)"]
+
+C1 --> C2
+C2 --> C3
+C3 --> C6
+
+C1 --> P1
+C2 --> P2
+C3 --> P3
+
+CHAT["🤖 Assistente IA<br/>Sempre disponível"]
+
+P1 --> CHAT
+P2 --> CHAT
+P3 --> CHAT
+
+end
+
+I --> Q
+
+Q --> F["Finalizar Avaliação"]
+
+subgraph S["MOTOR DE PONTUAÇÃO"]
+
+SC["Indicadores → Componentes → Camadas → Índice Global"]
+
+INT["Interdependências + Mapeamento CR1-CR6"]
+
+end
+
+F --> S
+
+D["Painel Hexagonal"]
+REL["Relatório PDF/Web"]
+REC["Recomendações<br/>Ferramentas IA"]
+
+S --> D
+S --> REL
+S --> REC
 ```
