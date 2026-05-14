@@ -233,31 +233,7 @@ G --> R
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
-```
-    Dados da avaliação completa
-            │
-            ▼
-    ┌───────────────────────┐
-    │  Template do relatório│
-    │                       │
-    │  1. Capa              │
-    │  2. Resumo Executivo  │
-    │  3. Perfil Org.       │
-    │  4. Diagnóstico x6    │
-    │     camadas           │
-    │  5. Interdependências │
-    │  6. CRs relevantes    │
-    │  7. Recomendações     │
-    │  8. Roteiro           │
-    └──────────┬────────────┘
-               │
-          ┌────┴────┐
-          ▼         ▼
-    ┌──────────┐ ┌──────────┐
-    │ Web View │ │  PDF     │
-    │ (HTML)   │ │ Download │
-    └──────────┘ └──────────┘
-```
+
 
 ---
 
