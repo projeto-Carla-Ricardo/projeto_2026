@@ -2,7 +2,7 @@
 
 ## 1. Diagrama Entidade-Relacionamento (Textual)
 
-```
+```mermaid
 flowchart TB
 
 U["UTILIZADORES<br/>id (PK)<br/>nome<br/>email<br/>password_hash<br/>papel<br/>created_at<br/>updated_at"]
