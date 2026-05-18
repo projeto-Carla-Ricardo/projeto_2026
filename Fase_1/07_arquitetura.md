@@ -4,68 +4,65 @@
 
 A arquitetura segue um padrão de **3 camadas** (frontend, backend, base de dados) com integração externa a um serviço LLM. A escolha reflete as necessidades académicas do projeto — simplicidade de deployment, facilidade de manutenção e alinhamento com as disciplinas do curso.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        BROWSER (Cliente)                        │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                    FRONTEND                               │  │
-│  │                                                          │  │
-│  │   HTML5 + CSS3 + JavaScript (Vanilla)                    │  │
-│  │                                                          │  │
-│  │   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │  │
-│  │   │ Landing  │ │ Auth     │ │Question. │ │Dashboard │  │  │
-│  │   │ Page     │ │ Pages    │ │ AILO     │ │& Reports │  │  │
-│  │   └──────────┘ └──────────┘ └─────┬────┘ └──────────┘  │  │
-│  │                                   │                      │  │
-│  │                              ┌────┴────┐                 │  │
-│  │                              │ Chat IA │                 │  │
-│  │                              │ Panel   │                 │  │
-│  │                              └─────────┘                 │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ HTTP/REST (JSON)
-                          │ JWT Auth
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        BACKEND (Servidor)                       │
-│                                                                 │
-│   Python / Flask                                                │
-│                                                                 │
-│   ┌─────────────────────────────────────────────────────────┐  │
-│   │                    API RESTful                           │  │
-│   │                                                         │  │
-│   │  /auth/*    /organizacoes/*    /avaliacoes/*             │  │
-│   │  /ailo/*    /relatorios/*      /chat/*                   │  │
-│   └──────────────────┬──────────────────────────────────────┘  │
-│                      │                                         │
-│   ┌──────────┐  ┌────┴─────┐  ┌──────────┐  ┌──────────────┐ │
-│   │ Auth     │  │ Scoring  │  │ Report   │  │ IA Service   │ │
-│   │ Module   │  │ Engine   │  │ Generator│  │ (LLM Proxy)  │ │
-│   │          │  │          │  │          │  │              │ │
-│   │ JWT      │  │ Por      │  │ PDF      │  │ Gemini API   │ │
-│   │ bcrypt   │  │ Camada   │  │ Template │  │ Prompt Eng.  │ │
-│   │ RBAC     │  │ Interdep.│  │ Charts   │  │ Context Mgmt │ │
-│   └──────────┘  │ CR1-CR6  │  └──────────┘  └──────┬───────┘ │
-│                 └──────────┘                        │          │
-│                      │                              │          │
-│                 ┌────┴─────┐                        │          │
-│                 │  ORM     │                  ┌─────┴────┐    │
-│                 │ SQLAlch. │                  │ Google   │    │
-│                 └────┬─────┘                  │ Gemini   │    │
-│                      │                        │ API      │    │
-└──────────────────────┼────────────────────────┴──────────┘────┘
-                       │                        (Externo)
-                       ▼
-┌─────────────────────────────────┐
-│      BASE DE DADOS              │
-│                                 │
-│   SQLite (dev)                  │
-│   PostgreSQL (prod)             │
-│                                 │
-│   12 tabelas                    │
-│   (ver modelo_dados.md)         │
-└─────────────────────────────────┘
+```mermaid
+flowchart TB
+
+subgraph BROWSER["🌐 Browser (Cliente)"]
+
+subgraph FRONT["🎨 Frontend"]
+F1["Landing Page"]
+F2["Autenticação"]
+F3["Questionário AILO"]
+F4["Painel & Relatórios"]
+F5["Assistente IA"]
+end
+
+end
+
+subgraph BACK["⚙️ Backend (Servidor Flask)"]
+
+subgraph API["API RESTful"]
+A1["/auth/*"]
+A2["/organizacoes/*"]
+A3["/avaliacoes/*"]
+A4["/ailo/*"]
+A5["/relatorios/*"]
+A6["/chat/*"]
+end
+
+AUTH["🔐 Módulo de Autenticação<br/>JWT<br/>bcrypt<br/>RBAC"]
+
+SCORING["📊 Motor de Pontuação<br/>Por Camada<br/>Interdependências<br/>CR1-CR6"]
+
+REPORT["📄 Gerador de Relatórios<br/>PDF<br/>Templates<br/>Gráficos"]
+
+IA["🤖 Serviço IA<br/>Gemini API<br/>Prompt Engineering<br/>Gestão de Contexto"]
+
+ORM["🗄️ ORM SQLAlchemy"]
+
+end
+
+subgraph DB["💾 Base de Dados"]
+DB1["SQLite (desenvolvimento)"]
+DB2["PostgreSQL (produção)"]
+DB3["12 tabelas"]
+end
+
+subgraph EXT["☁️ Serviço Externo"]
+G["Google Gemini API"]
+end
+
+FRONT -->|"HTTP/REST + JSON + JWT"| API
+
+API --> AUTH
+API --> SCORING
+API --> REPORT
+API --> IA
+
+SCORING --> ORM
+ORM --> DB
+
+IA --> G
 ```
 
 ---
@@ -89,91 +86,98 @@ A arquitetura segue um padrão de **3 camadas** (frontend, backend, base de dado
 
 ## 3. Estrutura de Pastas
 
-```
-Projeto_iALO/
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py           # Flask app factory
-│   │   ├── config.py             # Configurações (dev/prod)
-│   │   ├── models/               # Modelos SQLAlchemy
-│   │   │   ├── __init__.py
-│   │   │   ├── utilizador.py
-│   │   │   ├── organizacao.py
-│   │   │   ├── ailo.py           # Camadas, Componentes, Indicadores
-│   │   │   ├── avaliacao.py
-│   │   │   ├── resposta.py
-│   │   │   ├── resultado.py
-│   │   │   ├── ferramenta.py
-│   │   │   └── conversa.py
-│   │   ├── routes/               # Endpoints da API
-│   │   │   ├── __init__.py
-│   │   │   ├── auth.py
-│   │   │   ├── organizacoes.py
-│   │   │   ├── ailo.py
-│   │   │   ├── avaliacoes.py
-│   │   │   ├── respostas.py
-│   │   │   ├── resultados.py
-│   │   │   ├── chat.py
-│   │   │   └── relatorios.py
-│   │   ├── services/             # Lógica de negócio
-│   │   │   ├── __init__.py
-│   │   │   ├── scoring.py        # Motor de scoring AILO
-│   │   │   ├── interdependencias.py
-│   │   │   ├── ia_assistant.py   # Integração Gemini
-│   │   │   ├── report_generator.py
-│   │   │   └── recomendacoes.py
-│   │   └── utils/
-│   │       ├── auth.py           # JWT helpers
-│   │       ├── decorators.py     # @login_required, @admin_required
-│   │       └── validators.py
-│   ├── migrations/               # Alembic migrations
-│   ├── seeds/
-│   │   ├── camadas.py            # Seed das 6 camadas
-│   │   ├── componentes.py        # Seed dos 23 componentes
-│   │   ├── indicadores.py        # Seed dos 51 indicadores
-│   │   └── ferramentas.py        # Seed do catálogo de ferramentas
-│   ├── tests/
-│   │   ├── test_auth.py
-│   │   ├── test_scoring.py
-│   │   ├── test_api.py
-│   │   └── test_interdependencias.py
-│   ├── .env.example
-│   ├── requirements.txt
-│   ├── run.py
-│   └── seed.py                   # Script para popular BD
-│
-├── frontend/
-│   ├── index.html                # Landing page
-│   ├── css/
-│   │   ├── main.css              # Design system
-│   │   ├── questionario.css
-│   │   ├── dashboard.css
-│   │   └── relatorio.css
-│   ├── js/
-│   │   ├── app.js                # Routing e inicialização
-│   │   ├── api.js                # Wrapper para chamadas à API
-│   │   ├── auth.js               # Login/registo
-│   │   ├── questionario.js       # Lógica do questionário por camada
-│   │   ├── chat.js               # Chat com assistente IA
-│   │   ├── dashboard.js          # Gráficos e visualizações
-│   │   └── relatorio.js          # Visualização de relatório
-│   └── pages/
-│       ├── login.html
-│       ├── register.html
-│       ├── organizacoes.html
-│       ├── questionario.html
-│       ├── dashboard.html
-│       └── relatorio.html
-│
-├── docs/                         # Documentação do projeto
-│   └── Fase_1/                   # (esta pasta)
-│
-├── Fase_1/                       # Deliverables da Fase 1
-├── IALO_Eng.docx                 # Framework do professor
-├── IALO_pt.docx
-├── Relatorio_Desenvolvimento.docx
-├── relatório_inicial_IALO.docx
-└── .gitignore
+```mermaid
+flowchart TB
+
+ROOT["📁 Projeto_AILO"]
+
+ROOT --> BACK["📁 backend"]
+ROOT --> FRONT["📁 frontend"]
+ROOT --> DOCS["📁 docs"]
+ROOT --> FASE["📁 Fase_1"]
+ROOT --> DOCX["📄 Documentos .docx"]
+ROOT --> GIT["📄 .gitignore"]
+
+BACK --> APP["📁 app"]
+BACK --> MIG["📁 migrations"]
+BACK --> SEEDS["📁 seeds"]
+BACK --> TESTS["📁 tests"]
+BACK --> ENV["📄 .env.example"]
+BACK --> REQ["📄 requirements.txt"]
+BACK --> RUN["📄 run.py"]
+BACK --> SEEDPY["📄 seed.py"]
+
+APP --> MODELS["📁 models"]
+APP --> ROUTES["📁 routes"]
+APP --> SERVICES["📁 services"]
+APP --> UTILS["📁 utils"]
+APP --> INIT["📄 __init__.py"]
+APP --> CONFIG["📄 config.py"]
+
+MODELS --> M1["utilizador.py"]
+MODELS --> M2["organizacao.py"]
+MODELS --> M3["ailo.py"]
+MODELS --> M4["avaliacao.py"]
+MODELS --> M5["resposta.py"]
+MODELS --> M6["resultado.py"]
+MODELS --> M7["ferramenta.py"]
+MODELS --> M8["conversa.py"]
+
+ROUTES --> R1["auth.py"]
+ROUTES --> R2["organizacoes.py"]
+ROUTES --> R3["ailo.py"]
+ROUTES --> R4["avaliacoes.py"]
+ROUTES --> R5["respostas.py"]
+ROUTES --> R6["resultados.py"]
+ROUTES --> R7["chat.py"]
+ROUTES --> R8["relatorios.py"]
+
+SERVICES --> S1["scoring.py"]
+SERVICES --> S2["interdependencias.py"]
+SERVICES --> S3["ia_assistant.py"]
+SERVICES --> S4["report_generator.py"]
+SERVICES --> S5["recomendacoes.py"]
+
+UTILS --> U1["auth.py"]
+UTILS --> U2["decorators.py"]
+UTILS --> U3["validators.py"]
+
+SEEDS --> SD1["camadas.py"]
+SEEDS --> SD2["componentes.py"]
+SEEDS --> SD3["indicadores.py"]
+SEEDS --> SD4["ferramentas.py"]
+
+TESTS --> T1["test_auth.py"]
+TESTS --> T2["test_scoring.py"]
+TESTS --> T3["test_api.py"]
+TESTS --> T4["test_interdependencias.py"]
+
+FRONT --> HTML["📄 index.html"]
+FRONT --> CSS["📁 css"]
+FRONT --> JS["📁 js"]
+FRONT --> PAGES["📁 pages"]
+
+CSS --> C1["main.css"]
+CSS --> C2["questionario.css"]
+CSS --> C3["dashboard.css"]
+CSS --> C4["relatorio.css"]
+
+JS --> J1["app.js"]
+JS --> J2["api.js"]
+JS --> J3["auth.js"]
+JS --> J4["questionario.js"]
+JS --> J5["chat.js"]
+JS --> J6["dashboard.js"]
+JS --> J7["relatorio.js"]
+
+PAGES --> P1["login.html"]
+PAGES --> P2["register.html"]
+PAGES --> P3["organizacoes.html"]
+PAGES --> P4["questionario.html"]
+PAGES --> P5["dashboard.html"]
+PAGES --> P6["relatorio.html"]
+
+DOCS --> D1["📁 Fase_1"]
 ```
 
 ---
@@ -182,93 +186,55 @@ Projeto_iALO/
 
 ### 4.1. Motor de Scoring (`services/scoring.py`)
 
-```
-                    Respostas (51 indicadores, score 1-5)
-                               │
-                               ▼
-                    ┌───────────────────────┐
-                    │  Agrupar por          │
-                    │  Componente           │
-                    │  (23 componentes)     │
-                    └──────────┬────────────┘
-                               │ média ponderada
-                               ▼
-                    ┌───────────────────────┐
-                    │  Agrupar por          │
-                    │  Camada               │
-                    │  (6 camadas)          │
-                    └──────────┬────────────┘
-                               │ média ponderada (com pesos das camadas)
-                               ▼
-                    ┌───────────────────────┐
-                    │  Índice Global        │
-                    │  AILO                 │
-                    └──────────┬────────────┘
-                               │
-                    ┌──────────┼──────────┐
-                    ▼          ▼          ▼
-              ┌──────────┐ ┌──────┐ ┌────────────┐
-              │Interdep. │ │ CRs  │ │ Pontos     │
-              │análise   │ │mapping│ │ fortes/    │
-              │de pares  │ │CR1-6 │ │ lacunas    │
-              └──────────┘ └──────┘ └────────────┘
-```
+
 
 ### 4.2. Assistente IA (`services/ia_assistant.py`)
 
-```
-    Mensagem do Utilizador
-            │
-            ▼
-    ┌───────────────────────┐
-    │  Construir Contexto   │
-    │                       │
-    │  - System prompt AILO │
-    │  - Camada atual       │
-    │  - Tipo organização   │
-    │  - Respostas dadas    │
-    │  - Histórico chat     │
-    └──────────┬────────────┘
-               │
-               ▼
-    ┌───────────────────────┐
-    │  Google Gemini API    │
-    │  (gemini-2.0-flash)   │
-    └──────────┬────────────┘
-               │
-               ▼
-    ┌───────────────────────┐
-    │  Resposta formatada   │
-    │  + Gravar em BD       │
-    └───────────────────────┘
+```mermaid
+flowchart TB
+
+R["Respostas<br/>(51 indicadores, score 1-5)"]
+
+C["Agrupar por<br/>Componente<br/>(23 componentes)"]
+
+CA["Agrupar por<br/>Camada<br/>(6 camadas)"]
+
+G["Índice Global<br/>AILO"]
+
+I["Interdependências<br/>Análise de pares"]
+
+CR["CRs Mapping<br/>CR1-CR6"]
+
+P["Pontos fortes<br/>e lacunas"]
+
+R -->|"média ponderada"| C
+
+C -->|"média ponderada"| CA
+
+CA -->|"média ponderada<br/>(com pesos das camadas)"| G
+
+G --> I
+G --> CR
+G --> P
 ```
 
 ### 4.3. Gerador de Relatórios (`services/report_generator.py`)
 
-```
-    Dados da avaliação completa
-            │
-            ▼
-    ┌───────────────────────┐
-    │  Template do relatório│
-    │                       │
-    │  1. Capa              │
-    │  2. Resumo Executivo  │
-    │  3. Perfil Org.       │
-    │  4. Diagnóstico x6    │
-    │     camadas           │
-    │  5. Interdependências │
-    │  6. CRs relevantes    │
-    │  7. Recomendações     │
-    │  8. Roteiro           │
-    └──────────┬────────────┘
-               │
-          ┌────┴────┐
-          ▼         ▼
-    ┌──────────┐ ┌──────────┐
-    │ Web View │ │  PDF     │
-    │ (HTML)   │ │ Download │
-    └──────────┘ └──────────┘
+```mermaid
+flowchart TB
+
+D["Dados da avaliação completa"]
+
+T["Template do relatório<br/><br/>1. Capa<br/>2. Resumo Executivo<br/>3. Perfil da Organização<br/>4. Diagnóstico das 6 camadas<br/>5. Interdependências<br/>6. CRs relevantes<br/>7. Recomendações<br/>8. Roteiro"]
+
+W["Web View<br/>(HTML)"]
+
+P["PDF<br/>Download"]
+
+D --> T
+
+T --> W
+T --> P
 ```
 
 ---
@@ -306,19 +272,10 @@ Projeto_iALO/
 
 ## 7. Deployment (Demonstração)
 
-```
-    ┌─────────────────────────────┐
-    │    Servidor de Demonstração  │
-    │                             │
-    │    gunicorn (WSGI)          │
-    │         │                   │
-    │         ▼                   │
-    │    Flask App                │
-    │    + SQLite DB              │
-    │    + Static Files (frontend)│
-    │                             │
-    │    Port: 5000               │
-    └─────────────────────────────┘
+```mermaid
+flowchart TB
+
+S["Servidor de Demonstração<br/><br/>gunicorn (WSGI)<br/><br/>↓<br/><br/>Flask App<br/>+ SQLite DB<br/>+ Static Files (frontend)<br/><br/>Port: 5000"]
 ```
 
 Para demonstração académica, o Flask serve também os ficheiros estáticos do frontend. Em produção, seria separado com Nginx.

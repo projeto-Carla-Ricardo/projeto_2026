@@ -1,12 +1,12 @@
-# Análise Detalhada do Framework AILO
+# Análise Detalhada da Framework AILO
 
 ## 1. Visão Geral
 
-O **AILO — Artificial Intelligence in a Learning Organization** é um framework conceptual integrativo que explica como a Inteligência Artificial reconfigura os processos de aprendizagem nas Organizações Aprendentes (Learning Organizations).
+O **AILO — Artificial Intelligence in a Learning Organization** é uma framework conceptual integrativa que explica como a Inteligência Artificial reconfigura os processos de aprendizagem nas Organizações Aprendentes (Learning Organizations).
 
 **Autores:** Santos (2010), atualizado em Santos & Mamede (2026)
 
-**Conceito central:** A IA não é uma ferramenta passiva — é um **mediador cognitivo** inserido nas rotinas e infraestruturas organizacionais, capaz de suportar:
+**Conceito central:** A IA não é uma ferramenta passiva — é uma **mediadora cognitiva** inserida nas rotinas e infraestruturas organizacionais, capaz de suportar:
 - **Geração** de conhecimento
 - **Recomendação** de recursos e atividades
 - **Síntese** de informação
@@ -14,30 +14,39 @@ O **AILO — Artificial Intelligence in a Learning Organization** é um framewor
 
 ---
 
-## 2. Estrutura do Framework
+## 2. Estrutura da Framework
 
 O AILO organiza-se em **6 camadas analiticamente distintas**, articuladas em torno de um **núcleo central de Conhecimento Organizacional** em contínua evolução.
 
 ```
-                ┌──────────────────────┐
-                │   Organizacional     │
-                └──────────┬───────────┘
-         ┌─────────────┐   │   ┌─────────────────┐
-         │   Humana     │   │   │  Aprendizagem   │
-         └──────┬───────┘   │   └────────┬────────┘
-                │           │            │
-                │   ┌───────────────┐    │
-                │   │  AILO Core    │    │
-                │   │ Conhecimento  │    │
-                │   │Organizacional │    │
-                │   └───────────────┘    │
-                │           │            │
-         ┌──────┴───────┐   │   ┌────────┴────────┐
-         │  Avaliação    │   │   │ Cognitiva (IA)  │
-         └──────────────┘   │   └─────────────────┘
-                ┌───────────┴──────────┐
-                │   Tecnológica        │
-                └──────────────────────┘
+                 ┌──────────────────────┐
+                 │   ORGANIZACIONAL     │
+                 └─────────┬────────────┘
+                           │
+        ┌──────────────────┴──────────────────┐
+        │                                     │
+┌───────────────┐                   ┌────────────────┐
+│    HUMANA     │                   │ APRENDIZAGEM   │
+└──────┬────────┘                   └──────┬─────────┘
+       │                                   │
+       └──────────────┬────────────────────┘
+                      │
+           ┌──────────────────────────┐
+           │       AILO CORE          │
+           │  Conhecimento Org.       │
+           └──────────┬───────────────┘
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+┌───────────────┐          ┌────────────────────┐
+│   AVALIAÇÃO   │          │  COGNITIVA (IA)    │
+└──────┬────────┘          └─────────┬──────────┘
+       │                             │
+       └──────────────┬──────────────┘
+                      │
+             ┌─────────────────┐
+             │ TECNOLÓGICA     │
+             └─────────────────┘
 ```
 
 ### Dinâmica entre camadas:
@@ -51,14 +60,14 @@ O AILO organiza-se em **6 camadas analiticamente distintas**, articuladas em tor
 ## 3. Detalhe das 6 Camadas
 
 ### 3.1. Camada Organizacional
-**Função:** Liga a aprendizagem organizacional à estratégia, processos, decisão e criação de valor.
+**Função:** Liga a aprendizagem organizacional à estratégia, processos, tomada de decisão e criação de valor.
 
-| Componente | Descrição | Como a IA influencia |
-|-----------|-----------|---------------------|
-| **Estratégia** | Alinhamento entre aprendizagem, inovação e objetivos | IA conecta sinais de aprendizagem a objetivos estratégicos |
-| **Processos** | Integração da aprendizagem nos fluxos de trabalho | IA embebe aprendizagem em rotinas operacionais |
-| **Decisão** | Uso de evidência preservando julgamento humano | IA fornece apoio à decisão baseado em dados |
-| **Valor** | Impacto no desempenho, inovação e sustentabilidade | IA quantifica ROI da aprendizagem |
+| Componente | Descrição | Como a IA influencia                                    |
+|-----------|-----------|---------------------------------------------------------|
+| **Estratégia** | Alinhamento entre aprendizagem, inovação e objetivos | IA liga sinais de aprendizagem a objetivos estratégicos |
+| **Processos** | Integração da aprendizagem nos fluxos de trabalho | IA integra aprendizagem em rotinas operacionais         |
+| **Decisão** | Uso de evidência preservando julgamento humano | IA fornece apoio à decisão baseado em dados             |
+| **Valor** | Impacto no desempenho, inovação e sustentabilidade | IA quantifica ROI (retorno) da aprendizagem             |
 
 **Exigências de governação:** Transparência, responsabilização, explicabilidade, limites de automação (NIST, 2023; ISO/IEC 42001:2023; Regulamento UE 2024/1689).
 
@@ -74,7 +83,7 @@ O AILO organiza-se em **6 camadas analiticamente distintas**, articuladas em tor
 | **Autonomia** | Capacidade de questionar e sobrepor-se a recomendações algorítmicas | Automation bias e cognitive offloading |
 | **Ética** | Transparência, privacidade, equidade, responsabilização | Uso irresponsável da IA |
 
-**Princípio central:** IA como **augmentação**, não substituição. Expandir capacidade humana preservando princípios de personal mastery e team learning (Senge, 1990).
+**Princípio central:** IA como **aumento**, não substituição. Expandir capacidade humana preservando princípios de personal mastery e team learning (Senge, 1990).
 
 ---
 
@@ -96,12 +105,12 @@ O AILO organiza-se em **6 camadas analiticamente distintas**, articuladas em tor
 
 #### 4 Funções Cognitivas Nucleares:
 
-| Função | Descrição | Exemplos |
-|--------|-----------|----------|
-| **Geração** | Produção de explanações, exemplos, cenários, avaliações | IA generativa cria conteúdos de aprendizagem |
+| Função | Descrição                                                    | Exemplos |
+|--------|--------------------------------------------------------------|----------|
+| **Geração** | Produção de explicações, exemplos, cenários, avaliações      | IA generativa cria conteúdos de aprendizagem |
 | **Recomendação** | Sugestão de recursos, atividades, especialistas, comunidades | Sistemas de recomendação contextuais |
-| **Síntese** | Agregação e interpretação de grandes volumes de informação | Análise de traces de aprendizagem |
-| **Previsão** | Antecipação de gaps, necessidades e impactos | Modelos preditivos de competências |
+| **Síntese** | Agregação e interpretação de grandes volumes de informação   | Análise de traces de aprendizagem |
+| **Previsão** | Antecipação de gaps, necessidades e impactos                 | Modelos preditivos de competências |
 
 **Riscos:** Alucinações, viés, fuga de privacidade, sobre-automação. Requer práticas "human-in-the-loop" e governação (NIST-AI-600-1, 2024).
 
