@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-lg">
+            <h1>Resultados do Diagnóstico</h1>
+            <div class="flex gap-sm">
+                <button class="btn btn-primary" onclick="downloadPDF()">📥 Download PDF</button>
+                <button class="btn btn-secondary" onclick="openReport()">📄 Ver Relatório HTML</button>
+                <a href="/pages/dashboard.html" class="btn btn-secondary">← Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Global Score -->
+        <div class="card mb-lg" style="text-align:center;padding:40px;">
+            <div style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Índice Global AILO</div>
+            <div id="score-global" class="score-big mt-sm" style="font-size:64px;">-</div>
+            <div id="nivel-global" class="mt-sm" style="font-size:18px;color:var(--text-secondary);"></div>
+        </div>
+
+        <div class="grid grid-2 mb-lg">
+            <!-- Radar Chart -->
+            <div class="card">
+                <div class="card-header">Perfil Hexagonal AILO</div>
+                <canvas id="radar-chart"></canvas>
+            </div>
+            <!-- Bar Chart -->
+            <div class="card">
+                <div class="card-header">Score por Camada</div>
+                <canvas id="bar-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Per-layer details -->
+        <div id="camadas-detail"></div>
+
+        <!-- Recomendações de Ferramentas IA -->
+        <div class="card mt-lg" id="recs-section">
+            <div class="card-header">🤖 Ferramentas IA Recomendadas</div>
+            <div id="recs-content"><p style="color:var(--text-muted);padding:16px;">A carregar recomendações...</p></div>
+        </div>
+
+        <!-- Interdependencies -->
+        <div class="card mt-lg" id="interdep-section">
+            <div class="card-header">🔗 Interdependências entre Camadas</div>
+            <div id="interdep-content"></div>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const avalId = new URLSearchParams(window.location.search).get('id');
+
+        function nivelCor(s) { return s >= 3.5 ? 'var(--success)' : s >= 2.7 ? 'var(--warning)' : 'var(--danger)'; }
+        function nivelClass(s) { return s >= 3.5 ? 'verde' : s >= 2.7 ? 'amarelo' : 'vermelho'; }
+
+        async function loadResults() {
+            try {
+                const res = await api.getResultados(avalId);
+                // Global
+                document.getElementById('score-global').textContent = res.score_global.toFixed(1);
+                document.getElementById('score-global').style.color = nivelCor(res.score_global);
+                document.getElementById('nivel-global').innerHTML = `<span class="nivel-badge ${nivelClass(res.score_global)}">${res.nivel_global}</span>`;
+
+                // Radar
+                const labels = res.camadas.map(c => c.camada_nome);
+                const data = res.camadas.map(c => c.score);
+                const colors = res.camadas.map(c => c.camada_cor);
+
+                new Chart(document.getElementById('radar-chart'), {
+                    type: 'radar',
+                    data: { labels, datasets: [{ label: 'Score', data, fill: true, backgroundColor: 'rgba(4,138,129,0.15)', borderColor: '#048A81', pointBackgroundColor: colors, pointRadius: 5 }] },
+                    options: { scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1, color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#8fa3b8', font: { size: 11 } } } }, plugins: { legend: { display: false } } }
+                });
+
+                // Bar
+                new Chart(document.getElementById('bar-chart'), {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Score', data, backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 1 }] },
+                    options: { indexAxis: 'y', scales: { x: { beginAtZero: true, max: 5, ticks: { color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.04)' } }, y: { ticks: { color: '#8fa3b8' }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+                });
+
+                // Per-layer detail
+                document.getElementById('camadas-detail').innerHTML = res.camadas.map(c => `
+                    <div class="card mb-md animate-fade">
+                        <div class="flex justify-between items-center mb-md">
+                            <h2 style="color:${c.camada_cor};">${c.camada_nome}</h2>
+                            <div style="text-align:right;">
+                                <span style="font-size:32px;font-weight:700;color:${nivelCor(c.score)};">${c.score.toFixed(1)}</span>
+                                <span class="nivel-badge ${nivelClass(c.score)}" style="margin-left:8px;">${c.nivel}</span>
+                            </div>
+                        </div>
+                        <div class="progress mb-md"><div class="progress-bar" style="width:${c.score/5*100}%;background:${c.camada_cor};"></div></div>
+                        <div class="grid grid-3" style="gap:16px;">
+                            <div><h4 style="color:var(--success);font-size:14px;margin-bottom:8px;">✅ Pontos Fortes</h4>
+                                ${c.pontos_fortes.length ? c.pontos_fortes.map(p => `<p style="font-size:13px;color:var(--text-secondary);margin:4px 0;">• ${p}</p>`).join('') : '<p style="font-size:13px;color:var(--text-muted);">Sem pontos fortes identificados</p>'}
+                            </div>
+                            <div><h4 style="color:var(--warning);font-size:14px;margin-bottom:8px;">⚠️ Lacunas</h4>
+                                ${c.lacunas.length ? c.lacunas.map(l => `<p style="font-size:13px;color:var(--text-secondary);margin:4px 0;">• ${l}</p>`).join('') : '<p style="font-size:13px;color:var(--text-muted);">Sem lacunas</p>'}
+                            </div>
+                            <div><h4 style="color:var(--ailo-aprendizagem);font-size:14px;margin-bottom:8px;">💡 Recomendações</h4>
+                                ${c.recomendacoes.length ? c.recomendacoes.map(r => `<p style="font-size:13px;color:var(--text-secondary);margin:4px 0;">• ${r}</p>`).join('') : '<p style="font-size:13px;color:var(--text-muted);">Sem recomendações</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Interdependencies
+                if (res.interdependencias.length > 0) {
+                    document.getElementById('interdep-content').innerHTML = `
+                        <table class="table">
+                            <tr><th>Camada A</th><th>Camada B</th><th>Relação</th><th>Descrição</th><th>Impacto</th></tr>
+                            ${res.interdependencias.map(i => {
+                                const icon = {fortalece:'✅',risco:'⚠️',bloqueia:'🔴',oportunidade:'💡'}[i.tipo_relacao] || '•';
+                                return `<tr><td>${i.camada_a}</td><td>${i.camada_b}</td><td>${icon} ${i.tipo_relacao}</td><td style="font-size:13px;">${i.descricao}</td><td><span class="nivel-badge ${i.impacto==='alto'?'vermelho':'amarelo'}">${i.impacto}</span></td></tr>`;
+                            }).join('')}
+                        </table>`;
+                } else {
+                    document.getElementById('interdep-section').style.display = 'none';
+                }
+            } catch(e) { console.error(e); showToast('Erro ao carregar resultados', 'error'); }
+        }
+
+        function openReport() { window.open(`/api/v1/avaliacoes/${avalId}/relatorio/html`, '_blank'); }
+
+        function downloadPDF() {
+            const token = localStorage.getItem('ailo_token');
+            fetch(`/api/v1/avaliacoes/${avalId}/relatorio/pdf`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(r => {
+                if (!r.ok) throw new Error('Erro ao gerar PDF');
+                return r.blob();
+            }).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `AILO_Relatorio.pdf`; a.click();
+                URL.revokeObjectURL(url);
+                showToast('PDF descarregado com sucesso!', 'success');
+            }).catch(e => showToast(e.message, 'error'));
+        }
+
+        async function loadRecomendacoes() {
+            try {
+                const token = localStorage.getItem('ailo_token');
+                const res = await fetch(`/api/v1/avaliacoes/${avalId}/recomendacoes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (!data.recomendacoes || data.recomendacoes.length === 0) {
+                    document.getElementById('recs-content').innerHTML = '<p style="color:var(--text-muted);padding:16px;">Sem recomendações disponíveis.</p>';
+                    return;
+                }
+                document.getElementById('recs-content').innerHTML = data.recomendacoes.map((r, i) => `
+                    <div style="padding:16px;border-bottom:1px solid var(--border-color);display:flex;align-items:flex-start;gap:16px;" class="animate-fade">
+                        <div style="background:var(--ailo-cognitiva);color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">${r.prioridade}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">${r.ferramenta.nome}</div>
+                            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">${r.ferramenta.descricao}</div>
+                            <div style="font-size:12px;color:var(--text-muted);">
+                                <span style="margin-right:12px;">📂 ${r.ferramenta.area_funcional}</span>
+                                <span style="margin-right:12px;">💰 ${r.ferramenta.custo}</span>
+                                <span>⚙️ ${r.ferramenta.complexidade}</span>
+                            </div>
+                            <div style="font-size:13px;color:var(--ailo-aprendizagem);margin-top:6px;font-style:italic;">${r.justificacao}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        loadResults();
+        loadRecomendacoes();
+    </script>
+</body></html>

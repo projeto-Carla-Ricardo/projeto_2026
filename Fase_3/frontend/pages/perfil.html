@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content" style="max-width:600px;">
+        <h1 class="mb-lg">👤 Meu Perfil</h1>
+
+        <div class="card mb-lg" style="padding:24px;">
+            <div class="card-header" style="margin-bottom:16px;">Dados Pessoais</div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" id="nome" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" disabled style="opacity:0.6;">
+            </div>
+            <div class="form-group" style="display:flex;gap:8px;">
+                <div class="card stat-card" style="flex:1;padding:12px;text-align:center;">
+                    <div class="stat-number" id="total-aval">-</div>
+                    <div class="stat-label">Avaliações</div>
+                </div>
+                <div class="card stat-card" style="flex:1;padding:12px;text-align:center;">
+                    <div class="stat-number" id="total-comp">-</div>
+                    <div class="stat-label">Completas</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="savePerfil()">💾 Guardar Alterações</button>
+        </div>
+
+        <div class="card" style="padding:24px;">
+            <div class="card-header" style="margin-bottom:16px;">Alterar Password</div>
+            <div class="form-group">
+                <label class="form-label">Password Atual</label>
+                <input type="password" id="pw-atual" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nova Password</label>
+                <input type="password" id="pw-nova" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirmar Nova Password</label>
+                <input type="password" id="pw-confirmar" class="form-input">
+            </div>
+            <button class="btn btn-secondary" onclick="changePassword()">🔒 Alterar Password</button>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const token = localStorage.getItem('ailo_token');
+        const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+        async function loadPerfil() {
+            const r = await fetch('/api/v1/perfil', { headers });
+            const d = await r.json();
+            document.getElementById('nome').value = d.nome || '';
+            document.getElementById('email').value = d.email || '';
+            document.getElementById('total-aval').textContent = d.total_avaliacoes || 0;
+            document.getElementById('total-comp').textContent = d.avaliacoes_completas || 0;
+        }
+
+        async function savePerfil() {
+            const nome = document.getElementById('nome').value;
+            const r = await fetch('/api/v1/perfil', { method: 'PUT', headers, body: JSON.stringify({ nome }) });
+            if (r.ok) { showToast('Perfil atualizado!', 'success'); localStorage.setItem('ailo_user', JSON.stringify({...(JSON.parse(localStorage.getItem('ailo_user') || '{}')), nome})); }
+            else showToast('Erro ao atualizar', 'error');
+        }
+
+        async function changePassword() {
+            const atual = document.getElementById('pw-atual').value;
+            const nova = document.getElementById('pw-nova').value;
+            const confirmar = document.getElementById('pw-confirmar').value;
+            if (!atual || !nova) return showToast('Preencha todos os campos', 'error');
+            if (nova !== confirmar) return showToast('As passwords não coincidem', 'error');
+
+            const r = await fetch('/api/v1/perfil/password', { method: 'PUT', headers, body: JSON.stringify({ password_atual: atual, nova_password: nova }) });
+            const d = await r.json();
+            if (r.ok) {
+                showToast('Password alterada!', 'success');
+                document.getElementById('pw-atual').value = '';
+                document.getElementById('pw-nova').value = '';
+                document.getElementById('pw-confirmar').value = '';
+            } else showToast(d.error || 'Erro', 'error');
+        }
+
+        loadPerfil();
+    </script>
+</body></html>
