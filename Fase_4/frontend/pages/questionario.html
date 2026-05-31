@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content" style="max-width:900px;">
+        <div class="flex justify-between items-center mb-md">
+            <h1 id="page-title">Questionário AILO</h1>
+            <div id="progress-info" style="text-align:right;"></div>
+        </div>
+        <!-- Progress bar -->
+        <div class="progress mb-md"><div class="progress-bar" id="global-progress" style="width:0%;background:var(--accent);"></div></div>
+        <!-- Camada Tabs -->
+        <div class="camada-tabs" id="camada-tabs"></div>
+        <!-- Questions -->
+        <div id="questions-area"><div class="loading"><div class="spinner"></div></div></div>
+        <!-- Navigation -->
+        <div class="flex justify-between mt-lg" id="nav-buttons" style="display:none;">
+            <button class="btn btn-secondary" id="prev-btn" onclick="prevCamada()">← Anterior</button>
+            <button class="btn btn-primary" id="next-btn" onclick="nextCamada()">Próxima →</button>
+        </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header"><h3>💬 Assistente AILO</h3><button class="btn btn-sm btn-secondary" onclick="toggleChat()">✕</button></div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg assistant">Olá! Sou o assistente AILO. Estou aqui para ajudá-lo a compreender cada indicador. Pergunte-me qualquer dúvida!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Escreva a sua dúvida..." onkeypress="if(event.key==='Enter')sendChat()">
+            <button onclick="sendChat()">→</button>
+        </div>
+    </div>
+    <button class="chat-toggle" id="chat-toggle" onclick="toggleChat()">💬</button>
+
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const avalId = new URLSearchParams(window.location.search).get('id');
+        if (!avalId) { window.location.href = '/pages/dashboard.html'; throw 'no id'; }
+
+        let camadas = [], currentCamadaIdx = 0, respostas = {}, autoSaveTimer = null;
+        let codigoToId = {};
+
+        async function init() {
+            try {
+                const [camadasRes, respostasRes, avalRes] = await Promise.all([
+                    api.getCamadas(), api.getRespostas(avalId), api.getAvaliacao(avalId)
+                ]);
+                camadas = camadasRes.data;
+                respostasRes.data.forEach(r => { respostas[r.indicador_id] = { score: r.score, justificacao: r.justificacao }; });
+                camadas.forEach(c => c.componentes.forEach(comp => comp.indicadores.forEach(ind => codigoToId[ind.codigo] = ind.id)));
+                document.getElementById('page-title').textContent = `Avaliação: ${avalRes.organizacao?.nome || ''}`;
+                renderTabs();
+                renderCamada(0);
+            } catch(e) { console.error(e); showToast('Erro ao carregar questionário', 'error'); }
+        }
+
+        function renderTabs() {
+            const tabs = document.getElementById('camada-tabs');
+            tabs.innerHTML = camadas.map((c, i) => {
+                const total = c.componentes.reduce((s, comp) => s + comp.indicadores.length, 0);
+                const done = c.componentes.reduce((s, comp) => s + comp.indicadores.filter(ind => respostas[ind.id]).length, 0);
+                const doneClass = done === total && total > 0 ? ' done' : '';
+                return `<button class="camada-tab${i === currentCamadaIdx ? ' active' : ''}${doneClass}" onclick="renderCamada(${i})" style="border-bottom-color:${i === currentCamadaIdx ? c.cor : 'transparent'};" title="${c.nome}">${done === total && total > 0 ? '✅ ' : ''}${c.nome}</button>`;
+            }).join('');
+        }
+
+        function renderCamada(idx) {
+            currentCamadaIdx = idx;
+            const camada = camadas[idx];
+            const area = document.getElementById('questions-area');
+            renderTabs();
+            updateProgress();
+
+            let html = `<div style="margin-bottom:20px;padding:16px;border-left:4px solid ${camada.cor};background:var(--bg-card);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+                <h2 style="color:${camada.cor};margin-bottom:4px;">${camada.nome}</h2>
+                <p style="color:var(--text-secondary);font-size:14px;">${camada.descricao}</p></div>`;
+
+            camada.componentes.forEach(comp => {
+                let compHtml = `<h3 style="margin:24px 0 12px;color:var(--text-secondary);font-size:15px;">📌 ${comp.nome}</h3>`;
+                let hasVisible = false;
+                comp.indicadores.forEach(ind => {
+                    const isVisible = checkCondition(ind.condicao);
+                    if (!isVisible) return;
+                    hasVisible = true;
+                    const saved = respostas[ind.id];
+                    const selectedScore = saved?.score;
+                    compHtml += `<div class="question-card animate-fade" id="q-${ind.id}">
+                        <div class="question-code">${ind.codigo}</div>
+                        <div class="question-text">${ind.pergunta}</div>
+                        <div class="score-options">
+                            ${[1,2,3,4,5].map(n => {
+                                const desc = n===1 ? ind.desc_nivel_1 : n===3 ? ind.desc_nivel_3 : n===5 ? ind.desc_nivel_5 : '';
+                                return `<button class="score-option${selectedScore===n?' selected':''}" onclick="setScore(${ind.id},${n},this)" title="${desc}">
+                                    <span class="score-num">${n}</span>${desc ? `<span style="font-size:11px;">${desc.substring(0,40)}${desc.length>40?'...':''}</span>` : `<span style="font-size:11px;">Nível ${n}</span>`}
+                                </button>`;
+                            }).join('')}
+                        </div>
+                        <div style="margin-top:12px;">
+                            <textarea class="form-textarea" style="min-height:60px;font-size:13px;" placeholder="Justificação (opcional)..." onchange="setJustificacao(${ind.id},this.value)">${saved?.justificacao || ''}</textarea>
+                        </div>
+                    </div>`;
+                });
+                if (hasVisible) html += compHtml;
+            });
+
+            area.innerHTML = html;
+            document.getElementById('nav-buttons').style.display = 'flex';
+            document.getElementById('prev-btn').style.visibility = idx > 0 ? 'visible' : 'hidden';
+            const isLast = idx === camadas.length - 1;
+            document.getElementById('next-btn').textContent = isLast ? '✅ Finalizar Avaliação' : 'Próxima →';
+            document.getElementById('next-btn').onclick = isLast ? finalizarAvaliacao : nextCamada;
+        }
+
+        function setScore(indId, score, el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.score-option').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            if (!respostas[indId]) respostas[indId] = {};
+            respostas[indId].score = score;
+            scheduleAutoSave();
+            renderCamada(currentCamadaIdx); // re-render to update dependent indicators
+        }
+
+        function checkCondition(condicao) {
+            if (!condicao) return true;
+            const match = condicao.match(/([A-Z\.]+)\s*([>=<]+)\s*(\d+)/);
+            if (!match) return true;
+            const depId = codigoToId[match[1]];
+            const score = respostas[depId]?.score || 0;
+            const target = parseInt(match[3]);
+            if (match[2] === '>=' && score < target) return false;
+            if (match[2] === '<=' && score > target) return false;
+            if (match[2] === '==' && score !== target) return false;
+            return true;
+        }
+
+        function setJustificacao(indId, text) {
+            if (!respostas[indId]) respostas[indId] = {};
+            respostas[indId].justificacao = text;
+            scheduleAutoSave();
+        }
+
+        function scheduleAutoSave() {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(autoSave, 2000);
+        }
+
+        async function autoSave() {
+            const batch = Object.entries(respostas).filter(([_, v]) => v.score).map(([id, v]) => ({ indicador_id: parseInt(id), score: v.score, justificacao: v.justificacao }));
+            if (batch.length === 0) return;
+            try { await api.guardarRespostasBatch(avalId, batch); } catch(e) { console.error('Autosave error', e); }
+            updateProgress();
+            renderTabs();
+        }
+
+        function updateProgress() {
+            const totalInd = camadas.reduce((s, c) => s + c.componentes.reduce((s2, comp) => s2 + comp.indicadores.length, 0), 0);
+            const answered = Object.values(respostas).filter(r => r.score).length;
+            const pct = totalInd > 0 ? Math.round(answered / totalInd * 100) : 0;
+            document.getElementById('global-progress').style.width = pct + '%';
+            document.getElementById('progress-info').innerHTML = `<span style="font-size:24px;font-weight:700;">${pct}%</span><br><span style="font-size:12px;color:var(--text-muted);">${answered}/${totalInd} indicadores</span>`;
+        }
+
+        function prevCamada() { if (currentCamadaIdx > 0) { autoSave(); renderCamada(currentCamadaIdx - 1); window.scrollTo(0, 0); } }
+        function nextCamada() { autoSave(); renderCamada(currentCamadaIdx + 1); window.scrollTo(0, 0); }
+
+        async function finalizarAvaliacao() {
+            await autoSave();
+            try {
+                const val = await api.validarAvaliacao(avalId);
+                if (!val.completo) {
+                    let msg = "A avaliação tem " + val.pendentes.length + " indicadores obrigatórios por responder:\\n\\n";
+                    val.pendentes.forEach(p => msg += "• " + p.codigo + " - " + p.pergunta + "\\n");
+                    alert("⚠️ Avaliação Incompleta!\\n\\n" + msg);
+                    return;
+                }
+            } catch(e) {
+                console.error("Erro ao validar:", e);
+            }
+
+            if (!confirm('Finalizar a avaliação? Após finalizar, os resultados serão calculados.')) return;
+            try {
+                const res = await api.finalizarAvaliacao(avalId);
+                showToast('Avaliação finalizada com sucesso!', 'success');
+                setTimeout(() => window.location.href = `/pages/resultados.html?id=${avalId}`, 1000);
+            } catch(e) { showToast(e.error || 'Erro ao finalizar', 'error'); }
+        }
+
+        // Chat
+        function toggleChat() {
+            document.getElementById('chat-panel').classList.toggle('open');
+            document.getElementById('chat-toggle').style.display = document.getElementById('chat-panel').classList.contains('open') ? 'none' : 'flex';
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            const msgs = document.getElementById('chat-messages');
+            msgs.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+            msgs.innerHTML += `<div class="chat-msg assistant" id="chat-loading" style="opacity:0.5;">A pensar...</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+
+            const camadaId = camadas[currentCamadaIdx]?.id;
+            try {
+                const res = await api.enviarMensagem(avalId, msg, camadaId);
+                document.getElementById('chat-loading').remove();
+                msgs.innerHTML += `<div class="chat-msg assistant">${res.resposta.replace(/\n/g, '<br>')}</div>`;
+            } catch(e) {
+                document.getElementById('chat-loading').remove();
+                msgs.innerHTML += `<div class="chat-msg assistant">Desculpe, ocorreu um erro. Tente novamente.</div>`;
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        init();
+    </script>
+</body></html>

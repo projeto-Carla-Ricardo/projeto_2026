@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        .settings-grid { max-width: 700px; margin: 0 auto; }
+        .settings-card { margin-bottom: 24px; }
+        .settings-card .card-header { display: flex; align-items: center; gap: 8px; }
+        .setting-description { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+        .setting-description a { color: var(--accent); text-decoration: underline; }
+        .api-key-row { display: flex; gap: 8px; align-items: center; }
+        .api-key-row input { flex: 1; }
+        .key-status { font-size: 13px; margin-top: 8px; color: var(--warning); }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .info-item .info-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .info-item .info-value { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    </style>
+</head><body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a>
+        <div class="navbar-nav" id="nav-links"></div>
+    </nav>
+
+    <div class="main-content">
+        <div class="settings-grid">
+
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 6px;">⚙️ Configurações</h1>
+                <p style="color: var(--text-muted); font-size: 15px; margin: 0;">Gerir definições da sua conta AILO</p>
+            </div>
+
+            <!-- Card: Chave API Gemini -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span style="font-size: 18px;">🔑</span>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Chave API Gemini</h3>
+                </div>
+                <div class="card-body">
+                    <label class="form-label" for="gemini-api-key">Chave API Google Gemini</label>
+                    <p class="setting-description">
+                        Insira a sua chave de API do Google AI Studio para ativar o assistente IA.
+                        Obtenha a sua chave em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">https://aistudio.google.com/apikey</a>
+                    </p>
+                    <div class="api-key-row">
+                        <input type="password" class="form-control" id="gemini-api-key" placeholder="AIzaSy...">
+                        <button type="button" class="btn btn-secondary" id="toggle-key-btn" title="Mostrar/Ocultar chave" style="white-space: nowrap; padding: 8px 14px; font-size: 13px;">Mostrar</button>
+                    </div>
+                    <div class="key-status" id="key-status">⚠️ Sem chave configurada</div>
+                </div>
+            </div>
+
+            <!-- Card: Modelo Gemini -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span style="font-size: 18px;">🤖</span>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Modelo Gemini</h3>
+                </div>
+                <div class="card-body">
+                    <label class="form-label" for="gemini-model">Modelo de IA</label>
+                    <p class="setting-description">
+                        Selecione o modelo Gemini a utilizar nas interações com o assistente.
+                    </p>
+                    <select class="form-control" id="gemini-model">
+                        <option value="gemini-3.5-flash" selected>gemini-3.5-flash (Recomendado — Mais rápido)</option>
+                        <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Leve — Menor custo)</option>
+                        <option value="gemini-3-flash-preview">gemini-3-flash-preview (Preview — Funcionalidades experimentais)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button type="button" class="btn btn-primary btn-lg" id="save-settings-btn" style="width: 100%; margin-bottom: 32px;">
+                Guardar Configurações
+            </button>
+
+            <!-- Card: Informações da Conta -->
+            <div class="card settings-card">
+                <div class="card-header">
+                    <span style="font-size: 18px;">👤</span>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Informações da Conta</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Nome</div>
+                            <div class="info-value" id="info-nome">—</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email</div>
+                            <div class="info-value" id="info-email">—</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Papel</div>
+                            <div class="info-value" id="info-papel">—</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Data de Registo</div>
+                            <div class="info-value" id="info-registo">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const token = localStorage.getItem('ailo_token');
+        const headers = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+        // --- Load existing settings ---
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/v1/perfil/configuracoes', { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.gemini_api_key) {
+                        document.getElementById('gemini-api-key').value = data.gemini_api_key;
+                        document.getElementById('key-status').innerHTML = '✅ Chave configurada';
+                        document.getElementById('key-status').style.color = '#27AE60';
+                    }
+                    if (data.gemini_model) {
+                        document.getElementById('gemini-model').value = data.gemini_model;
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // --- Save settings ---
+        async function saveSettings() {
+            const apiKey = document.getElementById('gemini-api-key').value.trim();
+            const model = document.getElementById('gemini-model').value;
+            try {
+                const res = await fetch('/api/v1/perfil/configuracoes', {
+                    method: 'PUT', headers,
+                    body: JSON.stringify({ gemini_api_key: apiKey, gemini_model: model })
+                });
+                if (res.ok) {
+                    showToast('Configurações guardadas com sucesso!', 'success');
+                    // Update status
+                    if (apiKey) {
+                        document.getElementById('key-status').innerHTML = '✅ Chave configurada';
+                        document.getElementById('key-status').style.color = '#27AE60';
+                    } else {
+                        document.getElementById('key-status').innerHTML = '⚠️ Sem chave configurada';
+                        document.getElementById('key-status').style.color = '#F39C12';
+                    }
+                } else {
+                    const err = await res.json();
+                    showToast(err.error || 'Erro ao guardar', 'error');
+                }
+            } catch(e) { showToast('Erro de ligação', 'error'); }
+        }
+
+        // --- Load account info ---
+        async function loadAccountInfo() {
+            try {
+                const user = await api.getUser();
+                if (user) {
+                    document.getElementById('info-nome').textContent = user.nome || '—';
+                    document.getElementById('info-email').textContent = user.email || '—';
+                    document.getElementById('info-papel').textContent = user.papel || user.role || '—';
+                    if (user.data_registo || user.created_at) {
+                        const d = new Date(user.data_registo || user.created_at);
+                        document.getElementById('info-registo').textContent = d.toLocaleDateString('pt-PT', {
+                            day: '2-digit', month: 'long', year: 'numeric'
+                        });
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // --- Toggle API key visibility ---
+        document.getElementById('toggle-key-btn').addEventListener('click', function() {
+            const input = document.getElementById('gemini-api-key');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = 'Ocultar';
+            } else {
+                input.type = 'password';
+                this.textContent = 'Mostrar';
+            }
+        });
+
+        // --- Save button ---
+        document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+
+        // --- Init ---
+        requireAuth();
+        updateNavbar();
+        loadSettings();
+        loadAccountInfo();
+    </script>
+</body></html>

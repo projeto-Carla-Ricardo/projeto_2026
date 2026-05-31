@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .analytics-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; }
+        .analytics-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
+        .extra-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+        .extra-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; text-align: center; }
+        .extra-stat .val { font-size: 24px; font-weight: 700; color: var(--accent-light); }
+        .extra-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        @media (max-width: 768px) { .analytics-grid { grid-template-columns: 1fr; } .extra-stats { grid-template-columns: 1fr; } }
+    </style>
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-lg">
+            <h1>⚙️ Painel de Administração</h1>
+            <a href="/pages/dashboard.html" class="btn btn-secondary">← Dashboard</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-4 mb-lg" id="stats-grid">
+            <div class="card stat-card"><div class="stat-number" id="s-users">-</div><div class="stat-label">Utilizadores</div></div>
+            <div class="card stat-card"><div class="stat-number" id="s-orgs">-</div><div class="stat-label">Organizações</div></div>
+            <div class="card stat-card"><div class="stat-number" id="s-avals">-</div><div class="stat-label">Avaliações</div></div>
+            <div class="card stat-card"><div class="stat-number" id="s-score">-</div><div class="stat-label">Score Médio</div></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-sm mb-lg">
+            <button class="btn btn-primary" onclick="switchTab('indicadores')" id="tab-indicadores">📊 Indicadores</button>
+            <button class="btn btn-secondary" onclick="switchTab('ferramentas')" id="tab-ferramentas">🤖 Ferramentas IA</button>
+            <button class="btn btn-secondary" onclick="switchTab('utilizadores')" id="tab-utilizadores">👥 Utilizadores</button>
+            <button class="btn btn-secondary" onclick="switchTab('analytics')" id="tab-analytics">📈 Analytics</button>
+        </div>
+
+        <!-- Indicadores Tab -->
+        <div id="panel-indicadores" class="card">
+            <div class="card-header">Indicadores AILO (51)</div>
+            <div id="indicadores-list" style="max-height:500px;overflow-y:auto;"></div>
+        </div>
+
+        <!-- Ferramentas Tab -->
+        <div id="panel-ferramentas" class="card" style="display:none;">
+            <div class="card-header flex justify-between items-center">
+                <span>Catálogo de Ferramentas IA</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddFerramenta()">+ Nova Ferramenta</button>
+            </div>
+            <div id="ferramentas-list"></div>
+        </div>
+
+        <!-- Utilizadores Tab -->
+        <div id="panel-utilizadores" class="card" style="display:none;">
+            <div class="card-header">Utilizadores Registados</div>
+            <div id="utilizadores-list"></div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="panel-analytics" style="display:none;">
+            <div class="extra-stats" id="extra-stats"></div>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h4>📊 Distribuição de Níveis de Maturidade</h4>
+                    <canvas id="distChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h4>📈 Avaliações por Mês (últimos 12 meses)</h4>
+                    <canvas id="mesChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h4>🏢 Avaliações por Setor</h4>
+                    <canvas id="setorChart"></canvas>
+                </div>
+                <div class="analytics-card">
+                    <h4>🎯 Score Médio por Camada</h4>
+                    <canvas id="camadaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const token = localStorage.getItem('ailo_token');
+        const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+        function switchTab(tab) {
+            ['indicadores','ferramentas','utilizadores','analytics'].forEach(t => {
+                document.getElementById('panel-' + t).style.display = t === tab ? 'block' : 'none';
+                document.getElementById('tab-' + t).className = t === tab ? 'btn btn-primary' : 'btn btn-secondary';
+            });
+            if (tab === 'analytics' && !window._analyticsLoaded) { loadAnalytics(); window._analyticsLoaded = true; }
+        }
+
+        async function loadStats() {
+            try {
+                const r = await fetch('/api/v1/admin/stats', { headers });
+                const d = await r.json();
+                if (r.status === 403) { showToast('Acesso negado. Requer papel de administrador.', 'error'); return; }
+                document.getElementById('s-users').textContent = d.total_utilizadores;
+                document.getElementById('s-orgs').textContent = d.total_organizacoes;
+                document.getElementById('s-avals').textContent = d.total_avaliacoes;
+                document.getElementById('s-score').textContent = d.score_medio_global?.toFixed(1) || '—';
+            } catch(e) { showToast('Erro ao carregar estatísticas', 'error'); }
+        }
+
+        async function loadIndicadores() {
+            const r = await fetch('/api/v1/admin/indicadores', { headers });
+            const d = await r.json();
+            if (!d.data) return;
+            document.getElementById('indicadores-list').innerHTML = d.data.map(ind => `
+                <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+                    <div style="flex:1;">
+                        <div style="font-size:12px;color:var(--text-muted);">${ind.camada_nome || '?'} › ${ind.componente_nome || '?'} › <b>${ind.codigo}</b></div>
+                        <div style="font-size:14px;color:var(--text-primary);margin-top:2px;">${ind.pergunta}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                        <span style="font-size:12px;color:var(--text-muted);">Peso:</span>
+                        <input type="number" value="${ind.peso}" step="0.1" min="0.1" max="5" style="width:60px;padding:4px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:4px;color:var(--text-primary);text-align:center;"
+                            onchange="updatePeso(${ind.id}, this.value)">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updatePeso(id, peso) {
+            await fetch(`/api/v1/admin/indicadores/${id}`, { method: 'PUT', headers, body: JSON.stringify({ peso: parseFloat(peso) }) });
+            showToast('Peso atualizado', 'success');
+        }
+
+        async function loadFerramentas() {
+            const r = await fetch('/api/v1/admin/ferramentas', { headers });
+            const d = await r.json();
+            if (!d.data) return;
+            document.getElementById('ferramentas-list').innerHTML = d.data.map(f => `
+                <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <div style="font-weight:600;color:var(--text-primary);">${f.nome} ${f.ativo ? '' : '<span style="color:var(--danger);">[Desativada]</span>'}</div>
+                        <div style="font-size:13px;color:var(--text-secondary);">${f.descricao}</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">📂 ${f.area_funcional} · 💰 ${f.custo} · ⚙️ ${f.complexidade}</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="deleteFerramenta(${f.id})" style="flex-shrink:0;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteFerramenta(id) {
+            if (!confirm('Desativar esta ferramenta?')) return;
+            await fetch(`/api/v1/admin/ferramentas/${id}`, { method: 'DELETE', headers });
+            showToast('Ferramenta desativada', 'success');
+            loadFerramentas();
+        }
+
+        async function showAddFerramenta() {
+            const nome = prompt('Nome da ferramenta:');
+            if (!nome) return;
+            const descricao = prompt('Descrição:');
+            const area = prompt('Área funcional (ex: Educação, Gestão, Análise):');
+            const custo = prompt('Custo (gratuito/freemium/pago):');
+            const complexidade = prompt('Complexidade (baixa/média/alta):');
+            await fetch('/api/v1/admin/ferramentas', {
+                method: 'POST', headers,
+                body: JSON.stringify({ nome, descricao, area_funcional: area, custo, complexidade })
+            });
+            showToast('Ferramenta adicionada', 'success');
+            loadFerramentas();
+        }
+
+        async function loadUtilizadores() {
+            const r = await fetch('/api/v1/admin/utilizadores', { headers });
+            const d = await r.json();
+            if (!d.data) return;
+            document.getElementById('utilizadores-list').innerHTML = `
+                <table class="table">
+                    <tr><th>Nome</th><th>Email</th><th>Papel</th><th>Ativo</th><th>Registado</th></tr>
+                    ${d.data.map(u => `<tr>
+                        <td>${u.nome}</td><td>${u.email}</td>
+                        <td><span class="nivel-badge ${u.papel === 'admin' ? 'verde' : 'amarelo'}">${u.papel}</span></td>
+                        <td>${u.ativo ? '✅' : '❌'}</td>
+                        <td style="font-size:13px;">${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-PT') : '—'}</td>
+                    </tr>`).join('')}
+                </table>`;
+        }
+
+        loadStats(); loadIndicadores(); loadFerramentas(); loadUtilizadores();
+
+        async function loadAnalytics() {
+            const chartColors = { bg: 'rgba(255,255,255,0.06)', tick: '#5a7389', label: '#e8edf2' };
+            try {
+                // Overview extra
+                const ov = await fetch('/api/v1/analytics/overview', { headers }).then(r => r.json());
+                document.getElementById('extra-stats').innerHTML = `
+                    <div class="extra-stat"><div class="val">${ov.avaliacoes_concluidas}</div><div class="lbl">Concluídas</div></div>
+                    <div class="extra-stat"><div class="val">${ov.avaliacoes_em_curso}</div><div class="lbl">Em Curso</div></div>
+                    <div class="extra-stat"><div class="val">${ov.taxa_conclusao}%</div><div class="lbl">Taxa de Conclusão</div></div>`;
+
+                // Distribuição
+                const dist = await fetch('/api/v1/analytics/distribuicao-scores', { headers }).then(r => r.json());
+                new Chart(document.getElementById('distChart'), {
+                    type: 'doughnut',
+                    data: { labels: dist.distribuicao.map(d => d.faixa), datasets: [{ data: dist.distribuicao.map(d => d.count), backgroundColor: ['#E74C3C','#F39C12','#54C6EB','#048A81','#27AE60'] }] },
+                    options: { plugins: { legend: { labels: { color: chartColors.label, font: { size: 11 } } } } }
+                });
+
+                // Meses
+                const meses = await fetch('/api/v1/analytics/avaliacoes-por-mes', { headers }).then(r => r.json());
+                new Chart(document.getElementById('mesChart'), {
+                    type: 'line',
+                    data: { labels: meses.meses.map(m => m.mes), datasets: [{ label: 'Avaliações', data: meses.meses.map(m => m.count), borderColor: '#048A81', backgroundColor: 'rgba(4,138,129,0.1)', fill: true, tension: 0.3 }] },
+                    options: { scales: { y: { beginAtZero: true, ticks: { color: chartColors.tick }, grid: { color: chartColors.bg } }, x: { ticks: { color: chartColors.tick, font: { size: 10 } }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+                });
+
+                // Setores
+                const setores = await fetch('/api/v1/analytics/setores', { headers }).then(r => r.json());
+                new Chart(document.getElementById('setorChart'), {
+                    type: 'bar',
+                    data: { labels: setores.setores.map(s => s.nome), datasets: [{ label: 'Avaliações', data: setores.setores.map(s => s.total), backgroundColor: 'rgba(84,198,235,0.6)', borderRadius: 4 }] },
+                    options: { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { color: chartColors.tick }, grid: { color: chartColors.bg } }, y: { ticks: { color: chartColors.tick }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+                });
+
+                // Camadas
+                const cam = await fetch('/api/v1/analytics/scores-por-camada', { headers }).then(r => r.json());
+                new Chart(document.getElementById('camadaChart'), {
+                    type: 'radar',
+                    data: { labels: cam.camadas.map(c => c.camada), datasets: [{ label: 'Score Médio', data: cam.camadas.map(c => c.score_medio), borderColor: '#048A81', backgroundColor: 'rgba(4,138,129,0.15)', borderWidth: 2 }] },
+                    options: { scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: chartColors.tick }, grid: { color: chartColors.bg }, pointLabels: { color: chartColors.label, font: { size: 11 } } } }, plugins: { legend: { display: false } } }
+                });
+            } catch(e) { showToast('Erro ao carregar analytics', 'error'); }
+        }
+    </script>
+</body></html>

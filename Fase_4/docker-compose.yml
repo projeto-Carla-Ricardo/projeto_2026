@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: ailo-web
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      - DATABASE_URL=postgresql://ailo:ailo_secret@db:5432/ailo_db
+      - FLASK_ENV=production
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./reports:/app/backend/reports
+    networks:
+      - ailo-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: ailo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ailo_db
+      POSTGRES_USER: ailo
+      POSTGRES_PASSWORD: ailo_secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ailo -d ailo_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ailo-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: ailo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - web
+    networks:
+      - ailo-net
+
+volumes:
+  postgres_data:
+
+networks:
+  ailo-net:
+    driver: bridge

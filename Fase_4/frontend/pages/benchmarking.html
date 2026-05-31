@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmarking Setorial — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        .benchmark-header { text-align: center; padding: 40px 0 30px; }
+        .benchmark-header h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, var(--text-primary), var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .benchmark-header p { color: var(--text-secondary); font-size: 16px; }
+        .selector-row { display: flex; gap: 16px; align-items: end; margin-bottom: 32px; flex-wrap: wrap; }
+        .selector-row .form-group { flex: 1; min-width: 200px; margin-bottom: 0; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; }
+        .chart-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
+        .percentil-card { background: linear-gradient(135deg, var(--accent), var(--accent-light)); border-radius: var(--radius-md); padding: 32px; text-align: center; color: white; }
+        .percentil-card .value { font-size: 56px; font-weight: 800; line-height: 1; }
+        .percentil-card .label { font-size: 14px; opacity: 0.9; margin-top: 8px; }
+        .compare-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .compare-table th, .compare-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .compare-table th { color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .delta-pos { color: var(--success); font-weight: 600; }
+        .delta-neg { color: var(--danger); font-weight: 600; }
+        .delta-eq { color: var(--text-muted); }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="/"><div class="logo-hex"></div>AILO</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/pages/dashboard.html">Dashboard</a>
+            <a class="nav-link" href="/pages/organizacoes.html">Organizações</a>
+            <a class="nav-link active" href="/pages/benchmarking.html">Benchmarking</a>
+            <a class="nav-link" href="#" onclick="logout()">Sair</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="benchmark-header animate-fade">
+            <h1>📊 Benchmarking Setorial</h1>
+            <p>Compare a maturidade da sua organização com a média do setor</p>
+        </div>
+
+        <div class="selector-row animate-fade">
+            <div class="form-group">
+                <label class="form-label">Organização</label>
+                <select id="selOrg" class="form-select" onchange="carregarBenchmark()">
+                    <option value="">Selecionar organização...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Setor</label>
+                <select id="selSetor" class="form-select" disabled>
+                    <option value="">Selecionar primeiro uma organização</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="resultados" class="hidden">
+            <div class="stats-row" id="statsRow"></div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>🔮 Perfil de Maturidade vs Setor</h3>
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>📈 Comparação por Camada</h3>
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:24px">
+                <h3 class="card-header">Detalhes por Camada</h3>
+                <table class="compare-table" id="tabelaComparacao">
+                    <thead>
+                        <tr>
+                            <th>Camada</th>
+                            <th>Sua Organização</th>
+                            <th>Média do Setor</th>
+                            <th>Diferença</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <div class="icon">📊</div>
+            <h3>Selecione uma organização</h3>
+            <p>Escolha uma organização com avaliação concluída para ver o benchmarking setorial</p>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+        const API = window.AILO_API;
+        let radarChart = null, barChart = null;
+
+        async function init() {
+            if (!API.isAuthenticated()) { window.location.href = '/pages/login.html'; return; }
+            const res = await API.get('/organizacoes');
+            const orgs = res.data || [];
+            const sel = document.getElementById('selOrg');
+            orgs.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id; opt.textContent = o.nome; opt.dataset.setor = o.setor;
+                sel.appendChild(opt);
+            });
+        }
+
+        async function carregarBenchmark() {
+            const orgId = document.getElementById('selOrg').value;
+            if (!orgId) return;
+            const opt = document.getElementById('selOrg').selectedOptions[0];
+            const setor = opt.dataset.setor;
+            document.getElementById('selSetor').innerHTML = `<option>${setor}</option>`;
+
+            try {
+                const data = await API.get(`/benchmarking/${encodeURIComponent(setor)}?org_id=${orgId}`);
+                renderBenchmark(data);
+                document.getElementById('resultados').classList.remove('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+            } catch (e) {
+                document.getElementById('resultados').classList.add('hidden');
+                document.getElementById('emptyState').innerHTML = `
+                    <div class="icon">📭</div>
+                    <h3>Sem dados de benchmarking</h3>
+                    <p>Finalize pelo menos uma avaliação neste setor para ver comparações</p>`;
+                document.getElementById('emptyState').classList.remove('hidden');
+            }
+        }
+
+        function renderBenchmark(data) {
+            // Stats
+            const sr = document.getElementById('statsRow');
+            const org = data.organizacao || {};
+            sr.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${data.total_avaliacoes}</div><div class="stat-label">Avaliações no Setor</div></div>
+                <div class="stat-card"><div class="stat-value">${data.score_global_medio}</div><div class="stat-label">Score Médio do Setor</div></div>
+                <div class="stat-card"><div class="stat-value">${org.score_global || '—'}</div><div class="stat-label">Seu Score Global</div></div>
+                <div class="percentil-card"><div class="value">${org.percentil || 0}%</div><div class="label">Percentil no Setor</div></div>
+            `;
+
+            const labels = data.camadas.map(c => c.camada);
+            const setorScores = data.camadas.map(c => c.score_medio);
+            const orgScores = data.camadas.map(c => org.camadas ? (org.camadas[c.camada_id] || 0) : 0);
+
+            // Radar
+            if (radarChart) radarChart.destroy();
+            radarChart = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: {
+                    labels, datasets: [
+                        { label: 'Sua Organização', data: orgScores, borderColor: '#048A81', backgroundColor: 'rgba(4,138,129,0.15)', borderWidth: 2, pointRadius: 4 },
+                        { label: `Média ${data.setor}`, data: setorScores, borderColor: '#E8567F', backgroundColor: 'rgba(232,86,127,0.1)', borderWidth: 2, pointRadius: 4 }
+                    ]
+                },
+                options: { scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#8fa3b8', font: { size: 11 } } } }, plugins: { legend: { labels: { color: '#e8edf2' } } } }
+            });
+
+            // Bar
+            if (barChart) barChart.destroy();
+            barChart = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels, datasets: [
+                        { label: 'Sua Organização', data: orgScores, backgroundColor: 'rgba(4,138,129,0.7)', borderRadius: 4 },
+                        { label: `Média ${data.setor}`, data: setorScores, backgroundColor: 'rgba(232,86,127,0.7)', borderRadius: 4 }
+                    ]
+                },
+                options: { scales: { y: { min: 0, max: 5, ticks: { color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.06)' } }, x: { ticks: { color: '#8fa3b8', font: { size: 10 } }, grid: { display: false } } }, plugins: { legend: { labels: { color: '#e8edf2' } } } }
+            });
+
+            // Table
+            const tbody = document.querySelector('#tabelaComparacao tbody');
+            tbody.innerHTML = '';
+            data.camadas.forEach(c => {
+                const orgS = org.camadas ? (org.camadas[c.camada_id] || 0) : 0;
+                const diff = (orgS - c.score_medio).toFixed(2);
+                const cls = diff > 0 ? 'delta-pos' : diff < 0 ? 'delta-neg' : 'delta-eq';
+                const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+                tbody.innerHTML += `<tr><td style="color:${c.cor||'inherit'};font-weight:600">${c.camada}</td><td>${orgS.toFixed(2)}</td><td>${c.score_medio.toFixed(2)}</td><td class="${cls}">${arrow} ${Math.abs(diff)}</td></tr>`;
+            });
+        }
+
+        function logout() { localStorage.removeItem('ailo_token'); window.location.href = '/pages/login.html'; }
+        init();
+    </script>
+</body>
+</html>

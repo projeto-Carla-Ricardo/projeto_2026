@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparação Temporal — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content">
+        <div class="flex justify-between items-center mb-lg">
+            <h1>📊 Comparação Temporal</h1>
+            <a href="/pages/dashboard.html" class="btn btn-secondary">← Dashboard</a>
+        </div>
+
+        <!-- Org Selector -->
+        <div class="card mb-lg" style="padding:20px;">
+            <label style="color:var(--text-secondary);font-size:14px;">Selecionar organização:</label>
+            <select id="org-select" onchange="loadComparacao()" style="width:100%;max-width:400px;padding:10px;margin-top:8px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:14px;">
+                <option value="">— Escolher —</option>
+            </select>
+        </div>
+
+        <!-- Info -->
+        <div id="no-data" class="card mb-lg" style="padding:40px;text-align:center;">
+            <p style="color:var(--text-muted);font-size:16px;">Selecione uma organização para ver a evolução das avaliações ao longo do tempo.</p>
+            <p style="color:var(--text-muted);font-size:13px;margin-top:8px;">É necessário ter pelo menos 1 avaliação completa.</p>
+        </div>
+
+        <!-- Comparison Results -->
+        <div id="comparison-results" style="display:none;">
+            <div class="grid grid-2 mb-lg">
+                <div class="card">
+                    <div class="card-header">Evolução do Perfil Hexagonal</div>
+                    <canvas id="radar-compare"></canvas>
+                </div>
+                <div class="card">
+                    <div class="card-header">Evolução do Score Global</div>
+                    <canvas id="line-compare"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Detalhe das Avaliações</div>
+                <div id="table-compare"></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const token = localStorage.getItem('ailo_token');
+        const headers = { 'Authorization': `Bearer ${token}` };
+        const COLORS = ['#048A81', '#54C6EB', '#8A4FFF', '#FF6B6B', '#FFB84D', '#4ECDC4'];
+
+        async function loadOrgs() {
+            const r = await fetch('/api/v1/organizacoes', { headers });
+            const d = await r.json();
+            const sel = document.getElementById('org-select');
+            (d.data || []).forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id; opt.textContent = o.nome;
+                sel.appendChild(opt);
+            });
+        }
+
+        let radarChart, lineChart;
+        async function loadComparacao() {
+            const orgId = document.getElementById('org-select').value;
+            if (!orgId) { document.getElementById('comparison-results').style.display='none'; document.getElementById('no-data').style.display='block'; return; }
+
+            const r = await fetch(`/api/v1/organizacoes/${orgId}/comparacao`, { headers });
+            if (!r.ok) { showToast('Nenhuma avaliação completa encontrada', 'warning'); return; }
+            const data = await r.json();
+
+            document.getElementById('no-data').style.display = 'none';
+            document.getElementById('comparison-results').style.display = 'block';
+
+            // Get all layer names from first assessment
+            const camadaNames = Object.keys(data.avaliacoes[0].camadas);
+
+            // Radar Chart — overlay all assessments
+            const radarDatasets = data.avaliacoes.map((aval, i) => ({
+                label: new Date(aval.data).toLocaleDateString('pt-PT'),
+                data: camadaNames.map(c => aval.camadas[c]?.score || 0),
+                borderColor: COLORS[i % COLORS.length],
+                backgroundColor: COLORS[i % COLORS.length] + '20',
+                pointBackgroundColor: COLORS[i % COLORS.length],
+                fill: true
+            }));
+
+            if (radarChart) radarChart.destroy();
+            radarChart = new Chart(document.getElementById('radar-compare'), {
+                type: 'radar',
+                data: { labels: camadaNames, datasets: radarDatasets },
+                options: {
+                    scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1, color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#8fa3b8', font: { size: 11 } } } },
+                    plugins: { legend: { labels: { color: '#8fa3b8' } } }
+                }
+            });
+
+            // Line Chart — global score evolution
+            if (lineChart) lineChart.destroy();
+            lineChart = new Chart(document.getElementById('line-compare'), {
+                type: 'line',
+                data: {
+                    labels: data.avaliacoes.map(a => new Date(a.data).toLocaleDateString('pt-PT')),
+                    datasets: [{
+                        label: 'Score Global', data: data.avaliacoes.map(a => a.score_global),
+                        borderColor: '#048A81', backgroundColor: 'rgba(4,138,129,0.1)', fill: true,
+                        tension: 0.3, pointRadius: 6, pointBackgroundColor: '#048A81'
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true, max: 5, ticks: { color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.04)' } }, x: { ticks: { color: '#8fa3b8' }, grid: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Comparison table
+            document.getElementById('table-compare').innerHTML = `
+                <table class="table">
+                    <tr><th>Data</th><th>Score Global</th><th>Nível</th>${camadaNames.map(c => `<th>${c}</th>`).join('')}</tr>
+                    ${data.avaliacoes.map(a => `<tr>
+                        <td>${new Date(a.data).toLocaleDateString('pt-PT')}</td>
+                        <td style="font-weight:700;">${a.score_global?.toFixed(1) || '—'}</td>
+                        <td><span class="nivel-badge ${a.score_global >= 3.5 ? 'verde' : a.score_global >= 2.7 ? 'amarelo' : 'vermelho'}">${a.nivel_global}</span></td>
+                        ${camadaNames.map(c => `<td>${a.camadas[c]?.score?.toFixed(1) || '—'}</td>`).join('')}
+                    </tr>`).join('')}
+                </table>`;
+        }
+
+        loadOrgs();
+    </script>
+</body></html>

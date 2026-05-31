@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — AILO</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head><body>
+    <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
+    <div class="main-content">
+        <h1 class="mb-md" id="welcome-msg">Dashboard</h1>
+
+        <div class="grid grid-2 mb-lg">
+            <!-- Organizações -->
+            <div class="card">
+                <div class="card-header flex justify-between items-center">
+                    <span>📋 Minhas Organizações</span>
+                    <a href="/pages/organizacoes.html" class="btn btn-sm btn-primary">+ Nova</a>
+                </div>
+                <div id="org-list"><div class="loading"><div class="spinner"></div></div></div>
+            </div>
+            <!-- Avaliações recentes -->
+            <div class="card">
+                <div class="card-header">📊 Últimas Avaliações</div>
+                <div id="aval-list"><div class="loading"><div class="spinner"></div></div></div>
+            </div>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="card mb-lg" id="radar-section" style="display:none;">
+            <div class="card-header">Avaliação mais recente</div>
+            <div style="max-width:500px;margin:0 auto;">
+                <canvas id="radar-chart"></canvas>
+            </div>
+            <div class="flex justify-between items-center mt-md" id="radar-actions"></div>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
+    <script>
+        if (!requireAuth()) throw 'not auth';
+        const user = api.getUser();
+        document.getElementById('welcome-msg').textContent = `Bem-vindo, ${user?.nome || ''}`;
+
+        async function loadDashboard() {
+            // Organizações
+            try {
+                const orgs = await api.getOrganizacoes();
+                const orgList = document.getElementById('org-list');
+                if (orgs.data.length === 0) {
+                    orgList.innerHTML = '<div class="empty-state"><div class="icon">🏢</div><h3>Sem organizações</h3><p>Crie a sua primeira organização para começar.</p></div>';
+                } else {
+                    orgList.innerHTML = orgs.data.map(o => `
+                        <div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border);">
+                            <div><strong>${o.nome}</strong><br><span style="font-size:13px;color:var(--text-muted);">${o.setor} · ${o.tipo}</span></div>
+                            <button class="btn btn-sm btn-outline" onclick="iniciarAvaliacao(${o.id})">Avaliar</button>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) { console.error(e); }
+
+            // Avaliações
+            try {
+                const avals = await api.getAvaliacoes();
+                const avalList = document.getElementById('aval-list');
+                if (avals.data.length === 0) {
+                    avalList.innerHTML = '<div class="empty-state"><div class="icon">📊</div><h3>Sem avaliações</h3><p>Inicie a primeira avaliação.</p></div>';
+                } else {
+                    avalList.innerHTML = avals.data.slice(0, 5).map(a => {
+                        const statusIcon = (a.status === 'completa' || a.status === 'concluida') ? '✅' : '🔄';
+                        const nivelClass = a.score_global >= 3.5 ? 'verde' : a.score_global >= 2.7 ? 'amarelo' : 'vermelho';
+                        return `
+                        <div class="flex justify-between items-center" style="padding:12px 0;border-bottom:1px solid var(--border);">
+                            <div><strong>${a.organizacao?.nome || 'N/A'}</strong><br>
+                            <span style="font-size:13px;color:var(--text-muted);">${statusIcon} ${a.status} · ${a.progresso?.percentagem || 0}%</span></div>
+                            <div>
+                                ${(a.status === 'completa' || a.status === 'concluida') ? `<span class="nivel-badge ${nivelClass}">${a.score_global?.toFixed(1)}/5</span> <a href="/pages/resultados.html?id=${a.id}" class="btn btn-sm btn-secondary">Ver</a>` : `<a href="/pages/questionario.html?id=${a.id}" class="btn btn-sm btn-outline">Continuar</a>`}
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                    // Radar da mais recente completa
+                    const completa = avals.data.find(a => a.status === 'completa' || a.status === 'concluida');
+                    if (completa) { loadRadar(completa.id); }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadRadar(avalId) {
+            try {
+                const res = await api.getResultados(avalId);
+                document.getElementById('radar-section').style.display = 'block';
+                const labels = res.camadas.map(c => c.camada_nome);
+                const data = res.camadas.map(c => c.score);
+                const colors = res.camadas.map(c => c.camada_cor);
+
+                new Chart(document.getElementById('radar-chart'), {
+                    type: 'radar',
+                    data: {
+                        labels,
+                        datasets: [{ label: 'Score AILO', data, fill: true,
+                            backgroundColor: 'rgba(4,138,129,0.15)', borderColor: '#048A81',
+                            pointBackgroundColor: colors, pointBorderColor: '#fff', pointRadius: 5 }]
+                    },
+                    options: {
+                        scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1, color: '#5a7389' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#8fa3b8', font: { size: 12 } } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                document.getElementById('radar-actions').innerHTML = `
+                    <div><span class="score-big" style="color:${res.score_global >= 3.5 ? 'var(--success)' : res.score_global >= 2.7 ? 'var(--warning)' : 'var(--danger)'};">${res.score_global.toFixed(1)}</span><div class="score-label">${res.nivel_global}</div></div>
+                    <div><a href="/pages/resultados.html?id=${avalId}" class="btn btn-primary">Ver Detalhes</a></div>
+                `;
+            } catch(e) { console.error(e); }
+        }
+
+        async function iniciarAvaliacao(orgId) {
+            try {
+                const aval = await api.criarAvaliacao(orgId);
+                window.location.href = `/pages/questionario.html?id=${aval.id}`;
+            } catch(e) { showToast(e.error || 'Erro ao iniciar avaliação', 'error'); }
+        }
+
+        loadDashboard();
+    </script>
+</body></html>
