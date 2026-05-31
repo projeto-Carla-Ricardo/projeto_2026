@@ -4,6 +4,268 @@
     <title>Resultados — AILO</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        /* Maturity Gauge */
+        .maturity-section {
+            text-align: center;
+            padding: 40px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .maturity-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(4,138,129,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .maturity-gauge {
+            position: relative;
+            width: 220px;
+            height: 120px;
+            margin: 0 auto 16px;
+            overflow: hidden;
+        }
+        .maturity-gauge svg { width: 220px; height: 120px; }
+        .gauge-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .gauge-score {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 8px 0;
+        }
+        .gauge-nivel {
+            font-size: 22px;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        .gauge-desc {
+            max-width: 600px;
+            margin: 12px auto 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .gauge-next-level {
+            margin-top: 16px;
+            padding: 12px 20px;
+            background: rgba(4,138,129,0.06);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .gauge-next-level .next-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .gauge-next-level .next-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Critical Points */
+        .critical-card {
+            padding: 14px 18px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .critical-card:hover { transform: translateX(4px); }
+        .critical-alta { border-color: #E74C3C; background: rgba(231,76,60,0.05); }
+        .critical-media { border-color: #E67E22; background: rgba(230,126,34,0.05); }
+        .critical-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .critical-title { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+        .critical-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .critical-badge-alta { background: rgba(231,76,60,0.15); color: #E74C3C; }
+        .critical-badge-media { background: rgba(230,126,34,0.15); color: #E67E22; }
+        .critical-desc { font-size: 13px; color: var(--text-secondary); }
+        .critical-camada { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Immediate Suggestions */
+        .suggestion-card {
+            padding: 16px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .suggestion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .suggestion-categoria {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .cat-organizacional { background: rgba(46,64,87,0.1); color: #2E4057; }
+        .cat-formacao { background: rgba(52,152,219,0.1); color: #3498DB; }
+        .cat-processos { background: rgba(155,89,182,0.1); color: #9B59B6; }
+        .cat-documentacao { background: rgba(241,196,15,0.1); color: #B8860B; }
+        .cat-comunicacao { background: rgba(26,188,156,0.1); color: #1ABC9C; }
+        .suggestion-tags {
+            display: flex;
+            gap: 8px;
+        }
+        .suggestion-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(4,138,129,0.08);
+            color: var(--text-muted);
+        }
+        .suggestion-acao {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        .suggestion-indicators {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Report Chat */
+        .report-chat-panel {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .report-chat-header {
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(4,138,129,0.08), rgba(46,64,87,0.06));
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-chat-header h3 { margin: 0; font-size: 16px; }
+        .report-chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--bg-main);
+        }
+        .report-chat-messages .chat-msg {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 85%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .report-chat-messages .chat-msg.user {
+            background: var(--accent);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        .report-chat-messages .chat-msg.assistant {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 2px;
+        }
+        .report-chat-quick-actions {
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+        .quick-action-btn {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(4,138,129,0.3);
+            background: rgba(4,138,129,0.05);
+            color: #048A81;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .quick-action-btn:hover {
+            background: rgba(4,138,129,0.15);
+            border-color: #048A81;
+        }
+        .report-chat-input-area {
+            display: flex;
+            padding: 12px 16px;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+        .report-chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .report-chat-input-area button {
+            padding: 10px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .report-chat-input-area button:hover { background: #037a73; }
+
+        /* AI Loading */
+        .ai-suggestions-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 40px;
+        }
+        .ai-suggestions-loading .spinner-large {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(4,138,129,0.2);
+            border-top-color: #048A81;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .ai-suggestions-loading span {
+            font-size: 14px;
+            color: #048A81;
+        }
+    </style>
 </head><body>
     <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
     <div class="main-content">
@@ -16,11 +278,28 @@
             </div>
         </div>
 
-        <!-- Global Score -->
-        <div class="card mb-lg" style="text-align:center;padding:40px;">
-            <div style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Índice Global AILO</div>
-            <div id="score-global" class="score-big mt-sm" style="font-size:64px;">-</div>
-            <div id="nivel-global" class="mt-sm" style="font-size:18px;color:var(--text-secondary);"></div>
+        <!-- Maturity Level Gauge -->
+        <div class="card mb-lg maturity-section" id="maturity-section">
+            <div class="gauge-label">Nível de Maturidade AILO</div>
+            <div id="maturity-gauge-container">
+                <svg viewBox="0 0 220 120" style="width:220px;height:120px;margin:0 auto;display:block;">
+                    <!-- Background arc -->
+                    <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="rgba(128,128,128,0.15)" stroke-width="14" stroke-linecap="round"/>
+                    <!-- Progress arc -->
+                    <path id="gauge-arc" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#048A81" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 283"/>
+                    <!-- Level markers -->
+                    <circle cx="20" cy="110" r="3" fill="#E74C3C" opacity="0.6"/>
+                    <circle cx="56" cy="40" r="3" fill="#E67E22" opacity="0.6"/>
+                    <circle cx="110" cy="20" r="3" fill="#F39C12" opacity="0.6"/>
+                    <circle cx="164" cy="40" r="3" fill="#27AE60" opacity="0.6"/>
+                    <circle cx="200" cy="110" r="3" fill="#2ECC71" opacity="0.6"/>
+                </svg>
+            </div>
+            <div id="score-global" class="gauge-score" style="font-size:56px;">-</div>
+            <div style="font-size:14px;color:var(--text-muted);">/ 5.0</div>
+            <div id="nivel-global" class="gauge-nivel"></div>
+            <div id="maturity-desc" class="gauge-desc"></div>
+            <div id="maturity-next" class="gauge-next-level" style="display:none;"></div>
         </div>
 
         <div class="grid grid-2 mb-lg">
@@ -36,8 +315,30 @@
             </div>
         </div>
 
+        <!-- Critical Points (AI-generated) -->
+        <div class="card mb-lg" id="critical-section" style="display:none;">
+            <div class="card-header">⚠️ Pontos Críticos</div>
+            <div id="critical-content">
+                <div class="ai-suggestions-loading">
+                    <div class="spinner-large"></div>
+                    <span>A IA está a analisar os pontos críticos...</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Per-layer details -->
         <div id="camadas-detail"></div>
+
+        <!-- Immediate Suggestions (AI-generated) -->
+        <div class="card mt-lg" id="suggestions-section" style="display:none;">
+            <div class="card-header">🚀 Sugestões Imediatas (sem necessidade de equipa técnica)</div>
+            <div id="suggestions-content">
+                <div class="ai-suggestions-loading">
+                    <div class="spinner-large"></div>
+                    <span>A IA está a gerar sugestões personalizadas...</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Recomendações de Ferramentas IA -->
         <div class="card mt-lg" id="recs-section">
@@ -50,6 +351,27 @@
             <div class="card-header">🔗 Interdependências entre Camadas</div>
             <div id="interdep-content"></div>
         </div>
+
+        <!-- Report Chat -->
+        <div class="card mt-lg" id="report-chat-section">
+            <div class="card-header">💬 Pergunte à IA sobre o seu Relatório</div>
+            <div class="report-chat-panel">
+                <div class="report-chat-quick-actions">
+                    <button class="quick-action-btn" onclick="quickChat('Qual é o meu maior ponto fraco e como posso melhorar?')">🎯 Maior ponto fraco</button>
+                    <button class="quick-action-btn" onclick="quickChat('O que posso fazer imediatamente sem equipa técnica?')">🚀 Ações imediatas</button>
+                    <button class="quick-action-btn" onclick="quickChat('Explica as interdependências entre as camadas do meu resultado')">🔗 Interdependências</button>
+                    <button class="quick-action-btn" onclick="quickChat('Como posso atingir o próximo nível de maturidade?')">📈 Próximo nível</button>
+                    <button class="quick-action-btn" onclick="quickChat('Faz um resumo executivo do meu diagnóstico para apresentar à gestão')">📋 Resumo executivo</button>
+                </div>
+                <div class="report-chat-messages" id="report-chat-messages">
+                    <div class="chat-msg assistant">Olá! Sou o assistente AILO. Tenho acesso completo aos seus resultados. Pode perguntar-me qualquer coisa sobre o seu diagnóstico — pontos fortes, lacunas, sugestões, ou comparações entre camadas.</div>
+                </div>
+                <div class="report-chat-input-area">
+                    <input type="text" id="report-chat-input" placeholder="Pergunte sobre o seu relatório..." onkeypress="if(event.key==='Enter')sendReportChat()">
+                    <button onclick="sendReportChat()">→</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="/static/js/api.js"></script><script src="/static/js/app.js"></script>
     <script>
@@ -57,15 +379,29 @@
         const avalId = new URLSearchParams(window.location.search).get('id');
 
         function nivelCor(s) { return s >= 3.5 ? 'var(--success)' : s >= 2.7 ? 'var(--warning)' : 'var(--danger)'; }
+        function nivelCorHex(s) { return s >= 4.3 ? '#2ECC71' : s >= 3.5 ? '#27AE60' : s >= 2.7 ? '#F39C12' : s >= 1.9 ? '#E67E22' : '#E74C3C'; }
         function nivelClass(s) { return s >= 3.5 ? 'verde' : s >= 2.7 ? 'amarelo' : 'vermelho'; }
+
+        function updateGauge(score) {
+            const pct = Math.min(score / 5, 1);
+            const totalLen = 283; // approximate arc length
+            const dashLen = pct * totalLen;
+            const arc = document.getElementById('gauge-arc');
+            if (arc) {
+                arc.style.stroke = nivelCorHex(score);
+                arc.setAttribute('stroke-dasharray', `${dashLen} ${totalLen}`);
+            }
+        }
 
         async function loadResults() {
             try {
                 const res = await api.getResultados(avalId);
-                // Global
-                document.getElementById('score-global').textContent = res.score_global.toFixed(1);
-                document.getElementById('score-global').style.color = nivelCor(res.score_global);
-                document.getElementById('nivel-global').innerHTML = `<span class="nivel-badge ${nivelClass(res.score_global)}">${res.nivel_global}</span>`;
+                // Global Score & Gauge
+                const sg = res.score_global || 0;
+                document.getElementById('score-global').textContent = sg.toFixed(1);
+                document.getElementById('score-global').style.color = nivelCorHex(sg);
+                document.getElementById('nivel-global').innerHTML = `<span class="nivel-badge ${nivelClass(sg)}" style="font-size:18px;padding:6px 16px;">${res.nivel_global}</span>`;
+                updateGauge(sg);
 
                 // Radar
                 const labels = res.camadas.map(c => c.camada_nome);
@@ -126,6 +462,70 @@
             } catch(e) { console.error(e); showToast('Erro ao carregar resultados', 'error'); }
         }
 
+        async function loadAISuggestions() {
+            document.getElementById('critical-section').style.display = 'block';
+            document.getElementById('suggestions-section').style.display = 'block';
+
+            try {
+                const data = await api.getSuggestions(avalId);
+
+                // Maturity Level Description
+                if (data.nivel_maturidade) {
+                    const nm = data.nivel_maturidade;
+                    document.getElementById('maturity-desc').textContent = nm.descricao || '';
+                    if (nm.proximo_nivel) {
+                        const nextDiv = document.getElementById('maturity-next');
+                        nextDiv.style.display = 'inline-block';
+                        nextDiv.innerHTML = `
+                            <div class="next-label">📈 Próximo Nível: <strong>${nm.proximo_nivel}</strong></div>
+                            <div class="next-text">${nm.gap_proximo_nivel || ''}</div>`;
+                    }
+                }
+
+                // Critical Points
+                if (data.pontos_criticos && data.pontos_criticos.length > 0) {
+                    document.getElementById('critical-content').innerHTML = data.pontos_criticos.map(p => {
+                        const sev = p.severidade || 'media';
+                        return `<div class="critical-card critical-${sev}">
+                            <div class="critical-header">
+                                <div class="critical-title">${p.titulo}</div>
+                                <span class="critical-badge critical-badge-${sev}">${sev === 'alta' ? '🔴 Crítico' : '🟠 Atenção'}</span>
+                            </div>
+                            <div class="critical-desc">${p.descricao}</div>
+                            <div class="critical-camada">Camada: ${p.camada || '—'}</div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('critical-content').innerHTML = '<p style="padding:16px;color:var(--text-muted);">Nenhum ponto crítico identificado — bom trabalho! 🎉</p>';
+                }
+
+                // Immediate Suggestions
+                if (data.sugestoes_imediatas && data.sugestoes_imediatas.length > 0) {
+                    document.getElementById('suggestions-content').innerHTML = data.sugestoes_imediatas.map(s => {
+                        const catClass = 'cat-' + (s.categoria || 'organizacional').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        return `<div class="suggestion-card animate-fade">
+                            <div class="suggestion-header">
+                                <span class="suggestion-categoria ${catClass}">${s.categoria || 'Geral'}</span>
+                                <div class="suggestion-tags">
+                                    <span class="suggestion-tag">⚡ Esforço: ${s.esforco || '?'}</span>
+                                    <span class="suggestion-tag">📊 Impacto: ${s.impacto || '?'}</span>
+                                    ${s.prazo ? `<span class="suggestion-tag">⏱️ ${s.prazo}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="suggestion-acao">${s.acao}</div>
+                            ${s.indicadores_afetados && s.indicadores_afetados.length ? `<div class="suggestion-indicators">Indicadores afetados: ${s.indicadores_afetados.join(', ')}</div>` : ''}
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('suggestions-content').innerHTML = '<p style="padding:16px;color:var(--text-muted);">Sem sugestões imediatas disponíveis.</p>';
+                }
+            } catch(e) {
+                console.error('AI Suggestions error:', e);
+                document.getElementById('critical-content').innerHTML = `<p style="padding:16px;color:var(--danger);">Erro ao gerar análise IA: ${e.error || 'Tente novamente'}</p>`;
+                document.getElementById('suggestions-content').innerHTML = `<p style="padding:16px;color:var(--danger);">Erro ao gerar sugestões: ${e.error || 'Tente novamente'}</p>`;
+            }
+        }
+
         function openReport() {
             const token = localStorage.getItem('ailo_token');
             window.open(`/api/v1/avaliacoes/${avalId}/relatorio/html?token=${token}`, '_blank');
@@ -176,7 +576,45 @@
             } catch(e) { console.error(e); }
         }
 
+        // Report Chat
+        async function sendReportChat() {
+            const input = document.getElementById('report-chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+
+            const msgs = document.getElementById('report-chat-messages');
+            msgs.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
+            msgs.innerHTML += `<div class="chat-msg assistant" id="report-chat-loading" style="opacity:0.5;">🤖 A analisar o seu relatório...</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+
+            try {
+                const res = await api.sendReportChat(avalId, msg);
+                const loadingEl = document.getElementById('report-chat-loading');
+                if (loadingEl) loadingEl.remove();
+                msgs.innerHTML += `<div class="chat-msg assistant">${res.resposta.replace(/\n/g, '<br>')}</div>`;
+            } catch(e) {
+                const loadingEl = document.getElementById('report-chat-loading');
+                if (loadingEl) loadingEl.remove();
+                msgs.innerHTML += `<div class="chat-msg assistant" style="color:var(--danger);">Erro: ${e.error || 'Falha na comunicação com a IA'}</div>`;
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function quickChat(msg) {
+            document.getElementById('report-chat-input').value = msg;
+            sendReportChat();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load everything
         loadResults();
         loadRecomendacoes();
+        loadAISuggestions();
     </script>
 </body></html>

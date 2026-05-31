@@ -68,6 +68,18 @@ const api = {
     // Relatórios
     gerarRelatorio: (avalId) => api.request('POST', `/avaliacoes/${avalId}/relatorio`),
 
+    // Dynamic Questionnaire
+    getDynamicLayer: (avalId, camadaId) => api.request('GET', `/avaliacoes/${avalId}/dynamic-layer/${camadaId}`),
+    getAICommentary: (avalId, data) => api.request('POST', `/avaliacoes/${avalId}/ai-commentary`, data),
+
+    // Report Chat
+    sendReportChat: (avalId, mensagem) => api.request('POST', `/avaliacoes/${avalId}/report-chat`, { mensagem }),
+    getReportChatHistory: (avalId) => api.request('GET', `/avaliacoes/${avalId}/report-chat/historico`),
+    getSuggestions: (avalId) => api.request('GET', `/avaliacoes/${avalId}/suggestions`),
+
+    // API Key check
+    checkApiKey: () => api.request('GET', '/perfil/check-api-key'),
+
     // API Pública
     get: (url) => api.request('GET', url)
 };

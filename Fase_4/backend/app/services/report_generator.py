@@ -6,6 +6,7 @@ from app.models.avaliacao import Avaliacao
 from app.models.resultado import ResultadoCamada, Interdependencia
 from app.models.conversa import Relatorio
 from app.models.organizacao import Organizacao
+from app.models.resposta import Resposta
 
 def gerar_relatorio(avaliacao_id):
     """Gera relatório completo para uma avaliação."""
@@ -17,11 +18,25 @@ def gerar_relatorio(avaliacao_id):
     resultados = ResultadoCamada.query.filter_by(avaliacao_id=avaliacao_id).all()
     interdeps = Interdependencia.query.filter_by(avaliacao_id=avaliacao_id).all()
 
+    # Identify critical points (indicators with score <= 2)
+    respostas_list = Resposta.query.filter_by(avaliacao_id=avaliacao_id).all()
+    pontos_criticos = []
+    for r in respostas_list:
+        if r.score <= 2 and r.indicador:
+            pontos_criticos.append({
+                'codigo': r.indicador.codigo,
+                'pergunta': r.indicador.pergunta,
+                'score': r.score,
+                'camada': r.indicador.componente.camada.nome if r.indicador.componente else '?'
+            })
+    pontos_criticos.sort(key=lambda x: x['score'])
+
     conteudo = {
         'organizacao': org.to_dict(),
         'avaliacao': avaliacao.to_dict(),
         'resultados': [r.to_dict() for r in resultados],
         'interdependencias': [i.to_dict() for i in interdeps],
+        'pontos_criticos': pontos_criticos[:10],
         'data_geracao': datetime.utcnow().isoformat()
     }
 
@@ -114,6 +129,24 @@ def gerar_html_relatorio(avaliacao_id):
         <p><strong>Classificação:</strong> {avaliacao.nivel_global}</p>
         <p><strong>Setor:</strong> {org.setor} | <strong>Dimensão:</strong> {org.dimensao} | <strong>Tipo:</strong> {org.tipo}</p>
     </div>
+    <div style="margin:30px 0;padding:30px;background:#f8f9fa;border-radius:12px;text-align:center;">
+        <h2 style="color:#2E4057;">Nível de Maturidade AILO</h2>
+        <div style="font-size:48px;font-weight:700;color:{'#E74C3C' if (avaliacao.score_global or 0) < 1.5 else '#E67E22' if (avaliacao.score_global or 0) < 2.5 else '#F39C12' if (avaliacao.score_global or 0) < 3.5 else '#27AE60' if (avaliacao.score_global or 0) < 4.5 else '#2ECC71'};margin:20px 0;">{avaliacao.nivel_global}</div>
+        <div style="max-width:400px;margin:0 auto;">
+            <div style="background:#e0e0e0;border-radius:10px;height:20px;overflow:hidden;">
+                <div style="width:{(avaliacao.score_global or 0) / 5 * 100}%;height:100%;background:linear-gradient(90deg, #E74C3C 0%, #F39C12 40%, #27AE60 70%, #2ECC71 100%);border-radius:10px;transition:width 0.5s;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#999;">
+                <span>Inicial</span><span>Em Dev.</span><span>Definido</span><span>Gerido</span><span>Otimizado</span>
+            </div>
+        </div>
+    </div>
+    {''.join([
+        "<h1 style='color:#E74C3C;'>⚠️ Pontos Críticos</h1><div style='margin-bottom:30px;'>" +
+        ''.join([f"<div style='padding:12px 16px;margin:8px 0;border-left:4px solid {'#E74C3C' if r.score == 1 else '#E67E22'};background:#fff5f5;border-radius:0 8px 8px 0;'><strong style='color:{'#E74C3C' if r.score == 1 else '#E67E22'};'>{r.indicador.codigo}</strong> — {r.indicador.pergunta[:80]}<span style='float:right;background:{'#E74C3C' if r.score == 1 else '#E67E22'};color:white;padding:2px 8px;border-radius:4px;font-size:12px;'>Score: {r.score}/5</span><div style='font-size:12px;color:#999;margin-top:4px;'>Camada: {r.indicador.componente.camada.nome if r.indicador.componente else '?'}</div></div>"
+                 for r in sorted([resp for resp in Resposta.query.filter_by(avaliacao_id=avaliacao_id).all() if resp.score <= 2 and resp.indicador], key=lambda x: x.score)[:8]]) +
+        "</div>"
+    ]) if any(r.score <= 2 and r.indicador for r in Resposta.query.filter_by(avaliacao_id=avaliacao_id).all()) else ''}
     <h1>Diagnóstico por Camada</h1>
     {camadas_html}
     <h1>Interdependências</h1>

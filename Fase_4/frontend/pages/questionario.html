@@ -3,31 +3,508 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Questionário AILO</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        /* === AI Preparation Screen === */
+        .ai-preparation-screen {
+            text-align: center;
+            padding: 60px 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .ai-prep-icon {
+            width: 100px; height: 100px;
+            margin: 0 auto 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(4,138,129,0.12) 0%, rgba(46,64,87,0.08) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            position: relative;
+        }
+        .ai-prep-icon::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #048A81;
+            animation: spin 1.2s linear infinite;
+        }
+        .ai-prep-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .ai-prep-sector {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(4,138,129,0.15), rgba(4,138,129,0.08));
+            color: #048A81;
+            font-weight: 600;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            margin: 8px 0 20px;
+        }
+        .ai-prep-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+        .ai-prep-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+            margin: 24px 0;
+        }
+        .ai-prep-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.4s ease;
+        }
+        .ai-prep-step.active {
+            border-color: rgba(4,138,129,0.4);
+            background: rgba(4,138,129,0.04);
+        }
+        .ai-prep-step.done {
+            border-color: rgba(4,138,129,0.3);
+            background: rgba(4,138,129,0.06);
+            color: #048A81;
+        }
+        .ai-prep-step .step-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            background: rgba(128,128,128,0.1);
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+        }
+        .ai-prep-step.active .step-icon {
+            background: rgba(4,138,129,0.15);
+            color: #048A81;
+        }
+        .ai-prep-step.done .step-icon {
+            background: #048A81;
+            color: white;
+        }
+        .ai-prep-proceed {
+            margin-top: 32px;
+            animation: fadeSlideUp 0.5s ease;
+        }
+        .ai-prep-proceed .btn {
+            padding: 14px 36px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+        .ai-prep-hint {
+            margin-top: 20px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(4,138,129,0.06), rgba(46,64,87,0.04));
+            border: 1px solid rgba(4,138,129,0.15);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .ai-prep-hint .sabio-icon-inline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px; height: 22px;
+            background: linear-gradient(135deg, #048A81, #065f5b);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === AI Intro Panel === */
+        .ai-intro-panel {
+            background: linear-gradient(135deg, rgba(4,138,129,0.08) 0%, rgba(46,64,87,0.06) 100%);
+            border: 1px solid rgba(4,138,129,0.2);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-intro-panel::before {
+            content: '🤖';
+            position: absolute;
+            top: 12px; right: 16px;
+            font-size: 24px;
+            opacity: 0.4;
+        }
+        .ai-intro-panel .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(4,138,129,0.15);
+            color: #048A81;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ai-intro-panel .ai-badge .pulse-dot {
+            width: 6px; height: 6px;
+            background: #048A81;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        .ai-intro-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .ai-tips {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(4,138,129,0.1);
+        }
+        .ai-tip-item {
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 4px 0;
+        }
+        .ai-tip-item::before { content: '💡 '; }
+
+        /* === AI Commentary === */
+        .ai-commentary-panel {
+            background: linear-gradient(135deg, rgba(46,64,87,0.06) 0%, rgba(4,138,129,0.04) 100%);
+            border: 1px solid rgba(46,64,87,0.15);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0 24px;
+            animation: fadeSlideIn 0.5s ease;
+        }
+        .ai-commentary-panel .commentary-label {
+            font-size: 11px; font-weight: 600; color: #048A81;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+        .ai-commentary-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === Question Adaptations === */
+        .question-card .ai-adapted-label {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; color: #048A81;
+            background: rgba(4,138,129,0.08); padding: 2px 8px;
+            border-radius: 10px; margin-left: 8px;
+        }
+        .question-card .ai-dica {
+            font-size: 12px; color: var(--text-muted);
+            margin-top: 8px; padding: 8px 12px;
+            background: rgba(4,138,129,0.04); border-radius: 8px;
+            border-left: 3px solid rgba(4,138,129,0.3);
+        }
+
+        /* === Sábio Button === */
+        .sabio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #048A81, #065f5b);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(4,138,129,0.25);
+            margin-top: 10px;
+        }
+        .sabio-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(4,138,129,0.35);
+            background: linear-gradient(135deg, #05a097, #048A81);
+        }
+        .sabio-btn:active { transform: translateY(0); }
+        .sabio-btn .sabio-emoji { font-size: 14px; }
+
+        /* === Sábio Modal === */
+        .sabio-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .sabio-modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 560px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sabio-modal-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #048A81, #065f5b);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sabio-modal-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
+        .sabio-modal-header .sabio-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .sabio-modal-header .sabio-close:hover { background: rgba(255,255,255,0.3); }
+        .sabio-modal-question {
+            padding: 12px 20px;
+            background: rgba(4,138,129,0.06);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .sabio-modal-question strong { color: #048A81; }
+        .sabio-modal-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            min-height: 200px;
+            max-height: 350px;
+        }
+        .sabio-modal-messages .chat-msg {
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 90%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .sabio-modal-messages .chat-msg.user {
+            background: var(--accent);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        .sabio-modal-messages .chat-msg.assistant {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 2px;
+        }
+        .sabio-modal-input {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+        .sabio-modal-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .sabio-modal-input input:focus { outline: none; border-color: #048A81; }
+        .sabio-modal-input button {
+            padding: 10px 16px;
+            background: #048A81;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .sabio-modal-input button:hover { background: #037a73; }
+
+        /* === Loading & Misc === */
+        .ai-loading-overlay {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 20px; background: rgba(4,138,129,0.05);
+            border-radius: 12px; margin-bottom: 20px;
+        }
+        .ai-loading-overlay .ai-spinner {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(4,138,129,0.2);
+            border-top-color: #048A81;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .ai-loading-overlay span { font-size: 13px; color: #048A81; font-weight: 500; }
+
+        /* === Transition Overlay === */
+        .transition-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        @media (prefers-color-scheme: dark) {
+            .transition-overlay { background: rgba(20,25,35,0.88); }
+        }
+        .transition-spinner {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(4,138,129,0.2);
+            border-top-color: #048A81;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        .transition-text {
+            font-size: 17px;
+            font-weight: 600;
+            color: #048A81;
+        }
+        .transition-subtext {
+            font-size: 13px;
+            color: var(--text-muted, #888);
+            max-width: 320px;
+            text-align: center;
+            line-height: 1.5;
+        }
+    </style>
 </head><body>
+    <!-- Transition Overlay -->
+    <div id="transition-overlay" class="transition-overlay" style="display:none;">
+        <div class="transition-spinner"></div>
+        <div class="transition-text">Por favor aguarde...</div>
+        <div class="transition-subtext">A IA está a preparar a próxima secção do questionário para o seu setor de atividade.</div>
+    </div>
     <nav class="navbar"><a href="/" class="navbar-brand"><div class="logo-hex"></div><span>AILO</span></a><div class="navbar-nav" id="nav-links"></div></nav>
     <div class="main-content" style="max-width:900px;">
         <div class="flex justify-between items-center mb-md">
             <h1 id="page-title">Questionário AILO</h1>
             <div id="progress-info" style="text-align:right;"></div>
         </div>
-        <!-- Progress bar -->
-        <div class="progress mb-md"><div class="progress-bar" id="global-progress" style="width:0%;background:var(--accent);"></div></div>
-        <!-- Camada Tabs -->
-        <div class="camada-tabs" id="camada-tabs"></div>
-        <!-- Questions -->
-        <div id="questions-area"><div class="loading"><div class="spinner"></div></div></div>
-        <!-- Navigation -->
-        <div class="flex justify-between mt-lg" id="nav-buttons" style="display:none;">
-            <button class="btn btn-secondary" id="prev-btn" onclick="prevCamada()">← Anterior</button>
-            <button class="btn btn-primary" id="next-btn" onclick="nextCamada()">Próxima →</button>
+
+        <!-- AI Preparation Screen (shown while AI loads first layer) -->
+        <div id="ai-preparation-screen" style="display:none;">
+            <div class="ai-preparation-screen">
+                <div class="ai-prep-icon">🧠</div>
+                <div class="ai-prep-title">A IA está a preparar o seu questionário</div>
+                <div id="ai-prep-sector" class="ai-prep-sector"></div>
+                <div class="ai-prep-desc">
+                    O assistente inteligente está a analisar o setor de atividade da sua organização
+                    para adaptar e personalizar todas as questões ao seu contexto específico.
+                </div>
+                <div class="ai-prep-steps">
+                    <div class="ai-prep-step active" id="prep-step-1">
+                        <div class="step-icon">🔍</div>
+                        <span>A analisar o setor de atividade...</span>
+                    </div>
+                    <div class="ai-prep-step" id="prep-step-2">
+                        <div class="step-icon">🧩</div>
+                        <span>A adaptar indicadores e perguntas...</span>
+                    </div>
+                    <div class="ai-prep-step" id="prep-step-3">
+                        <div class="step-icon">💡</div>
+                        <span>A gerar dicas contextuais...</span>
+                    </div>
+                </div>
+                <!-- Proceed button (hidden until AI finishes) -->
+                <div id="ai-prep-proceed" class="ai-prep-proceed" style="display:none;">
+                    <button class="btn btn-primary" onclick="proceedToQuestionnaire()">
+                        ✅ Prosseguir com questionário
+                    </button>
+                    <div class="ai-prep-hint">
+                        A qualquer momento carregue no botão
+                        <span class="sabio-icon-inline">🦉</span>
+                        <strong>Sábio</strong>
+                        para tirar as suas dúvidas sobre essa questão em particular.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questionnaire Content (hidden until user clicks proceed) -->
+        <div id="questionnaire-content" style="display:none;">
+            <!-- Progress bar -->
+            <div class="progress mb-md" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress-container">
+                <div class="progress-bar" id="global-progress" style="width:0%;background:var(--accent);"></div>
+            </div>
+            <!-- AI Commentary (between sections) -->
+            <div id="ai-commentary-area"></div>
+            <!-- Camada Tabs -->
+            <div class="camada-tabs" id="camada-tabs" role="tablist"></div>
+            <!-- AI Intro Panel -->
+            <div id="ai-intro-area"></div>
+            <!-- Questions -->
+            <div id="questions-area"></div>
+            <!-- Navigation -->
+            <div class="flex justify-between mt-lg" id="nav-buttons" style="display:none;" aria-label="Navegação do Questionário">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevCamada()" aria-label="Ir para a camada anterior">← Anterior</button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextCamada()" aria-label="Avançar para a próxima camada">Próxima →</button>
+            </div>
         </div>
     </div>
+
+    <!-- Sábio Modal (injected dynamically) -->
+    <div id="sabio-modal-container"></div>
 
     <!-- Chat Panel -->
     <div class="chat-panel" id="chat-panel">
         <div class="chat-header"><h3>💬 Assistente AILO</h3><button class="btn btn-sm btn-secondary" onclick="toggleChat()">✕</button></div>
         <div class="chat-messages" id="chat-messages">
-            <div class="chat-msg assistant">Olá! Sou o assistente AILO. Estou aqui para ajudá-lo a compreender cada indicador. Pergunte-me qualquer dúvida!</div>
+            <div class="chat-msg assistant">Olá! Sou o assistente AILO com IA integrada. Pergunte-me qualquer dúvida sobre o questionário!</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Escreva a sua dúvida..." onkeypress="if(event.key==='Enter')sendChat()">
@@ -44,6 +521,12 @@
 
         let camadas = [], currentCamadaIdx = 0, respostas = {}, autoSaveTimer = null;
         let codigoToId = {};
+        let dynamicData = {};
+        let dynamicLoading = {};
+        let orgSetor = '';
+        let orgNome = '';
+        let questionnaireReady = false;
+        let hasExistingAnswers = false;
 
         async function init() {
             try {
@@ -53,10 +536,167 @@
                 camadas = camadasRes.data;
                 respostasRes.data.forEach(r => { respostas[r.indicador_id] = { score: r.score, justificacao: r.justificacao }; });
                 camadas.forEach(c => c.componentes.forEach(comp => comp.indicadores.forEach(ind => codigoToId[ind.codigo] = ind.id)));
-                document.getElementById('page-title').textContent = `Avaliação: ${avalRes.organizacao?.nome || ''}`;
-                renderTabs();
-                renderCamada(0);
-            } catch(e) { console.error(e); showToast('Erro ao carregar questionário', 'error'); }
+
+                orgNome = avalRes.organizacao?.nome || '';
+                orgSetor = avalRes.organizacao?.setor || 'desconhecido';
+                hasExistingAnswers = Object.keys(respostas).length > 0;
+
+                document.getElementById('page-title').textContent = `Avaliação: ${orgNome}`;
+
+                // If continuing an existing evaluation, skip preparation and go directly to questions
+                if (hasExistingAnswers) {
+                    showQuestionnaire();
+                    loadDynamicLayer(0);
+                } else {
+                    // New evaluation — show AI preparation screen
+                    showPreparationScreen();
+                }
+            } catch(e) {
+                console.error(e);
+                if (e.status === 401) {
+                    window.location.href = '/pages/login.html';
+                    return;
+                }
+                showToast('Erro ao carregar questionário', 'error');
+            }
+        }
+
+        function showPreparationScreen() {
+            document.getElementById('ai-preparation-screen').style.display = 'block';
+            document.getElementById('questionnaire-content').style.display = 'none';
+            document.getElementById('ai-prep-sector').textContent = `🏢 ${orgSetor}`;
+
+            // Animate steps while loading
+            animatePreparationSteps();
+
+            // Start loading the first layer
+            loadDynamicLayerForPrep(0);
+        }
+
+        async function animatePreparationSteps() {
+            const steps = ['prep-step-1', 'prep-step-2', 'prep-step-3'];
+
+            // Step 1 starts active
+            await delay(1200);
+            document.getElementById(steps[0]).classList.remove('active');
+            document.getElementById(steps[0]).classList.add('done');
+            document.getElementById(steps[0]).querySelector('.step-icon').textContent = '✓';
+
+            // Step 2
+            document.getElementById(steps[1]).classList.add('active');
+            await delay(1500);
+            document.getElementById(steps[1]).classList.remove('active');
+            document.getElementById(steps[1]).classList.add('done');
+            document.getElementById(steps[1]).querySelector('.step-icon').textContent = '✓';
+
+            // Step 3
+            document.getElementById(steps[2]).classList.add('active');
+        }
+
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function loadDynamicLayerForPrep(idx) {
+            dynamicLoading[idx] = true;
+            const camada = camadas[idx];
+            if (!camada) return;
+
+            try {
+                const result = await api.getDynamicLayer(avalId, camada.id);
+                dynamicData[idx] = result;
+                dynamicLoading[idx] = false;
+
+                // Mark step 3 as done
+                const step3 = document.getElementById('prep-step-3');
+                if (step3) {
+                    step3.classList.remove('active');
+                    step3.classList.add('done');
+                    step3.querySelector('.step-icon').textContent = '✓';
+                }
+
+                // Show proceed button
+                const proceedDiv = document.getElementById('ai-prep-proceed');
+                if (proceedDiv) {
+                    proceedDiv.style.display = 'block';
+                }
+
+                // Pre-load next layer in background
+                if (idx + 1 < camadas.length) {
+                    setTimeout(() => loadDynamicLayer(idx + 1), 500);
+                }
+            } catch(e) {
+                console.error('Dynamic layer error:', e);
+                dynamicLoading[idx] = false;
+                // Even on error, let user proceed
+                const proceedDiv = document.getElementById('ai-prep-proceed');
+                if (proceedDiv) {
+                    proceedDiv.style.display = 'block';
+                }
+            }
+        }
+
+        function proceedToQuestionnaire() {
+            document.getElementById('ai-preparation-screen').style.display = 'none';
+            showQuestionnaire();
+        }
+
+        function showQuestionnaire() {
+            questionnaireReady = true;
+            document.getElementById('questionnaire-content').style.display = 'block';
+            renderTabs();
+            renderCamada(0);
+        }
+
+        async function loadDynamicLayer(idx) {
+            if (dynamicData[idx] || dynamicLoading[idx]) return;
+            dynamicLoading[idx] = true;
+
+            const camada = camadas[idx];
+            if (!camada) return;
+
+            const introArea = document.getElementById('ai-intro-area');
+            if (idx === currentCamadaIdx && questionnaireReady) {
+                introArea.innerHTML = `<div class="ai-loading-overlay"><div class="ai-spinner"></div><span>A IA está a personalizar as perguntas para o seu setor...</span></div>`;
+            }
+
+            try {
+                const result = await api.getDynamicLayer(avalId, camada.id);
+                dynamicData[idx] = result;
+                dynamicLoading[idx] = false;
+
+                if (idx === currentCamadaIdx && questionnaireReady) {
+                    renderAIIntro(idx);
+                    renderCamadaQuestions(idx);
+                }
+
+                if (idx + 1 < camadas.length && !dynamicData[idx + 1]) {
+                    setTimeout(() => loadDynamicLayer(idx + 1), 500);
+                }
+            } catch(e) {
+                console.error('Dynamic layer error:', e);
+                dynamicLoading[idx] = false;
+                if (idx === currentCamadaIdx && questionnaireReady) {
+                    introArea.innerHTML = '';
+                    renderCamadaQuestions(idx);
+                }
+            }
+        }
+
+        function renderAIIntro(idx) {
+            const introArea = document.getElementById('ai-intro-area');
+            const data = dynamicData[idx];
+            if (!data) { introArea.innerHTML = ''; return; }
+
+            let tipsHtml = '';
+            if (data.tips && data.tips.length > 0) {
+                tipsHtml = `<div class="ai-tips">${data.tips.map(t => `<div class="ai-tip-item">${t}</div>`).join('')}</div>`;
+            }
+
+            introArea.innerHTML = `
+                <div class="ai-intro-panel animate-fade">
+                    <div class="ai-badge"><div class="pulse-dot"></div> IA Ativa — Perguntas Personalizadas</div>
+                    <div class="ai-intro-text">${data.intro_text || ''}</div>
+                    ${tipsHtml}
+                </div>`;
         }
 
         function renderTabs() {
@@ -65,16 +705,31 @@
                 const total = c.componentes.reduce((s, comp) => s + comp.indicadores.length, 0);
                 const done = c.componentes.reduce((s, comp) => s + comp.indicadores.filter(ind => respostas[ind.id]).length, 0);
                 const doneClass = done === total && total > 0 ? ' done' : '';
-                return `<button class="camada-tab${i === currentCamadaIdx ? ' active' : ''}${doneClass}" onclick="renderCamada(${i})" style="border-bottom-color:${i === currentCamadaIdx ? c.cor : 'transparent'};" title="${c.nome}">${done === total && total > 0 ? '✅ ' : ''}${c.nome}</button>`;
+                const selected = i === currentCamadaIdx ? 'true' : 'false';
+                return `<button class="camada-tab${i === currentCamadaIdx ? ' active' : ''}${doneClass}" role="tab" aria-selected="${selected}" onclick="renderCamada(${i})" style="border-bottom-color:${i === currentCamadaIdx ? c.cor : 'transparent'};" title="${c.nome}">${done === total && total > 0 ? '✅ ' : ''}${c.nome}</button>`;
             }).join('');
         }
 
         function renderCamada(idx) {
             currentCamadaIdx = idx;
-            const camada = camadas[idx];
-            const area = document.getElementById('questions-area');
             renderTabs();
             updateProgress();
+            renderAIIntro(idx);
+            renderCamadaQuestions(idx);
+            loadDynamicLayer(idx);
+
+            document.getElementById('nav-buttons').style.display = 'flex';
+            document.getElementById('prev-btn').style.visibility = idx > 0 ? 'visible' : 'hidden';
+            const isLast = idx === camadas.length - 1;
+            document.getElementById('next-btn').textContent = isLast ? '✅ Finalizar Avaliação' : 'Próxima →';
+            document.getElementById('next-btn').onclick = isLast ? finalizarAvaliacao : nextCamada;
+        }
+
+        function renderCamadaQuestions(idx) {
+            const camada = camadas[idx];
+            const area = document.getElementById('questions-area');
+            const aiData = dynamicData[idx];
+            const adaptedQuestions = aiData?.adapted_questions || {};
 
             let html = `<div style="margin-bottom:20px;padding:16px;border-left:4px solid ${camada.cor};background:var(--bg-card);border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
                 <h2 style="color:${camada.cor};margin-bottom:4px;">${camada.nome}</h2>
@@ -89,19 +744,37 @@
                     hasVisible = true;
                     const saved = respostas[ind.id];
                     const selectedScore = saved?.score;
+
+                    const adapted = adaptedQuestions[String(ind.id)] || {};
+                    const pergunta = adapted.pergunta_adaptada || ind.pergunta;
+                    const hasAdapted = !!adapted.pergunta_adaptada;
+
                     compHtml += `<div class="question-card animate-fade" id="q-${ind.id}">
-                        <div class="question-code">${ind.codigo}</div>
-                        <div class="question-text">${ind.pergunta}</div>
-                        <div class="score-options">
+                        <div class="question-code">${ind.codigo}${hasAdapted ? '<span class="ai-adapted-label">🤖 Personalizada</span>' : ''}</div>
+                        <div class="question-text">${pergunta}</div>
+                        <div class="score-options" role="radiogroup" aria-label="Pontuação para o indicador ${ind.codigo}">
                             ${[1,2,3,4,5].map(n => {
-                                const desc = n===1 ? ind.desc_nivel_1 : n===3 ? ind.desc_nivel_3 : n===5 ? ind.desc_nivel_5 : '';
-                                return `<button class="score-option${selectedScore===n?' selected':''}" onclick="setScore(${ind.id},${n},this)" title="${desc}">
-                                    <span class="score-num">${n}</span>${desc ? `<span style="font-size:11px;">${desc.substring(0,40)}${desc.length>40?'...':''}</span>` : `<span style="font-size:11px;">Nível ${n}</span>`}
+                                let desc = '';
+                                if (adapted[`desc_nivel_${n}`]) {
+                                    desc = adapted[`desc_nivel_${n}`];
+                                } else if (n === 1) { desc = ind.desc_nivel_1 || ''; }
+                                else if (n === 3) { desc = ind.desc_nivel_3 || ''; }
+                                else if (n === 5) { desc = ind.desc_nivel_5 || ''; }
+                                const checked = selectedScore === n ? 'true' : 'false';
+                                return `<button class="score-option${selectedScore === n ? ' selected' : ''}" role="radio" aria-checked="${checked}" tabindex="0" onclick="setScore(${ind.id},${n},this)" title="${desc}">
+                                    <span class="score-num">${n}</span>${desc ? `<span style="font-size:11px;">${desc.substring(0,60)}${desc.length > 60 ? '...' : ''}</span>` : `<span style="font-size:11px;">Nível ${n}</span>`}
                                 </button>`;
                             }).join('')}
                         </div>
-                        <div style="margin-top:12px;">
-                            <textarea class="form-textarea" style="min-height:60px;font-size:13px;" placeholder="Justificação (opcional)..." onchange="setJustificacao(${ind.id},this.value)">${saved?.justificacao || ''}</textarea>
+                        ${adapted.dica ? `<div class="ai-dica">💡 ${adapted.dica}</div>` : ''}
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+                            <button class="sabio-btn" onclick="openSabio(${ind.id}, '${ind.codigo}', \`${pergunta.replace(/`/g,"'").replace(/\\/g,"\\\\")}\`)">
+                                <span class="sabio-emoji">🦉</span> Sábio
+                            </button>
+                            <span style="font-size:11px;color:var(--text-muted);">Tire dúvidas sobre esta questão</span>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <textarea class="form-textarea" aria-label="Justificação opcional" style="min-height:60px;font-size:13px;" placeholder="Justificação (opcional)..." onchange="setJustificacao(${ind.id},this.value)">${saved?.justificacao || ''}</textarea>
                         </div>
                     </div>`;
                 });
@@ -109,21 +782,93 @@
             });
 
             area.innerHTML = html;
-            document.getElementById('nav-buttons').style.display = 'flex';
-            document.getElementById('prev-btn').style.visibility = idx > 0 ? 'visible' : 'hidden';
-            const isLast = idx === camadas.length - 1;
-            document.getElementById('next-btn').textContent = isLast ? '✅ Finalizar Avaliação' : 'Próxima →';
-            document.getElementById('next-btn').onclick = isLast ? finalizarAvaliacao : nextCamada;
         }
 
+        // === Sábio Modal ===
+        let sabioContext = {};
+
+        function openSabio(indId, codigo, pergunta) {
+            sabioContext = { indId, codigo, pergunta, messages: [] };
+
+            const container = document.getElementById('sabio-modal-container');
+            container.innerHTML = `
+                <div class="sabio-overlay" id="sabio-overlay" onclick="if(event.target===this)closeSabio()">
+                    <div class="sabio-modal">
+                        <div class="sabio-modal-header">
+                            <h3>🦉 Sábio — Assistente de Dúvidas</h3>
+                            <button class="sabio-close" onclick="closeSabio()">✕</button>
+                        </div>
+                        <div class="sabio-modal-question">
+                            <strong>${codigo}</strong> — ${pergunta}
+                        </div>
+                        <div class="sabio-modal-messages" id="sabio-messages">
+                            <div class="chat-msg assistant">
+                                Olá! Sou o <strong>Sábio</strong> 🦉. Estou aqui para esclarecer as suas dúvidas sobre esta questão.
+                                <br><br>Pode perguntar-me, por exemplo:
+                                <br>• O que significa este indicador na prática?
+                                <br>• Como avaliar a minha organização neste ponto?
+                                <br>• Qual a diferença entre os níveis?
+                            </div>
+                        </div>
+                        <div class="sabio-modal-input">
+                            <input type="text" id="sabio-input" placeholder="Escreva a sua dúvida sobre esta questão..." onkeypress="if(event.key==='Enter')sendSabio()">
+                            <button onclick="sendSabio()">→</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            setTimeout(() => document.getElementById('sabio-input')?.focus(), 300);
+        }
+
+        function closeSabio() {
+            document.getElementById('sabio-modal-container').innerHTML = '';
+            sabioContext = {};
+        }
+
+        async function sendSabio() {
+            const input = document.getElementById('sabio-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+
+            const msgs = document.getElementById('sabio-messages');
+            msgs.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
+            msgs.innerHTML += `<div class="chat-msg assistant" id="sabio-loading" style="opacity:0.5;">🦉 A pensar...</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+
+            // Send as a chat message with context of the specific question
+            const contextMsg = `[Sábio — Questão ${sabioContext.codigo}: "${sabioContext.pergunta}"] ${msg}`;
+            const camadaId = camadas[currentCamadaIdx]?.id;
+
+            try {
+                const res = await api.enviarMensagem(avalId, contextMsg, camadaId);
+                const loadingEl = document.getElementById('sabio-loading');
+                if (loadingEl) loadingEl.remove();
+                msgs.innerHTML += `<div class="chat-msg assistant">${res.resposta.replace(/\n/g, '<br>')}</div>`;
+            } catch(e) {
+                const loadingEl = document.getElementById('sabio-loading');
+                if (loadingEl) loadingEl.remove();
+                msgs.innerHTML += `<div class="chat-msg assistant" style="color:var(--danger);">Erro: ${e.error || 'Falha na comunicação'}</div>`;
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // === Standard Functions ===
         function setScore(indId, score, el) {
             const parent = el.parentElement;
-            parent.querySelectorAll('.score-option').forEach(b => b.classList.remove('selected'));
+            parent.querySelectorAll('.score-option').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-checked', 'false'); });
             el.classList.add('selected');
+            el.setAttribute('aria-checked', 'true');
             if (!respostas[indId]) respostas[indId] = {};
             respostas[indId].score = score;
             scheduleAutoSave();
-            renderCamada(currentCamadaIdx); // re-render to update dependent indicators
+            renderCamadaQuestions(currentCamadaIdx);
         }
 
         function checkCondition(condicao) {
@@ -166,28 +911,93 @@
             document.getElementById('progress-info').innerHTML = `<span style="font-size:24px;font-weight:700;">${pct}%</span><br><span style="font-size:12px;color:var(--text-muted);">${answered}/${totalInd} indicadores</span>`;
         }
 
-        function prevCamada() { if (currentCamadaIdx > 0) { autoSave(); renderCamada(currentCamadaIdx - 1); window.scrollTo(0, 0); } }
-        function nextCamada() { autoSave(); renderCamada(currentCamadaIdx + 1); window.scrollTo(0, 0); }
+        function showTransition(msg) {
+            const overlay = document.getElementById('transition-overlay');
+            if (msg) overlay.querySelector('.transition-subtext').textContent = msg;
+            overlay.style.display = 'flex';
+        }
+        function hideTransition() {
+            document.getElementById('transition-overlay').style.display = 'none';
+        }
+
+        async function prevCamada() {
+            if (currentCamadaIdx > 0) {
+                showTransition('A carregar a secção anterior...');
+                await autoSave();
+
+                const prevIdx = currentCamadaIdx - 1;
+                // Wait for dynamic data if not yet loaded
+                if (!dynamicData[prevIdx]) {
+                    await loadDynamicLayerAwait(prevIdx);
+                }
+
+                renderCamada(prevIdx);
+                window.scrollTo(0, 0);
+                hideTransition();
+            }
+        }
+
+        async function nextCamada() {
+            showTransition('A IA está a preparar a próxima secção do questionário para o seu setor de atividade.');
+            await autoSave();
+            const nextIdx = currentCamadaIdx + 1;
+
+            // Load AI commentary and next layer data in parallel
+            const [commentaryResult] = await Promise.allSettled([
+                api.getAICommentary(avalId, { current_camada_idx: nextIdx }).catch(e => { console.error('Commentary error:', e); return null; }),
+                dynamicData[nextIdx] ? Promise.resolve() : loadDynamicLayerAwait(nextIdx)
+            ]);
+
+            // Show commentary if available
+            const commentaryArea = document.getElementById('ai-commentary-area');
+            const commentary = commentaryResult?.value;
+            if (commentary?.commentary) {
+                commentaryArea.innerHTML = `
+                    <div class="ai-commentary-panel">
+                        <div class="commentary-label">🤖 Análise da IA</div>
+                        <div class="ai-commentary-text">${commentary.commentary}</div>
+                    </div>`;
+                setTimeout(() => { commentaryArea.innerHTML = ''; }, 8000);
+            } else {
+                commentaryArea.innerHTML = '';
+            }
+
+            renderCamada(nextIdx);
+            window.scrollTo(0, 0);
+            hideTransition();
+        }
+
+        async function loadDynamicLayerAwait(idx) {
+            if (dynamicData[idx]) return;
+            const camada = camadas[idx];
+            if (!camada) return;
+            try {
+                const result = await api.getDynamicLayer(avalId, camada.id);
+                dynamicData[idx] = result;
+                dynamicLoading[idx] = false;
+            } catch(e) {
+                console.error('Dynamic layer error:', e);
+                dynamicLoading[idx] = false;
+            }
+        }
 
         async function finalizarAvaliacao() {
             await autoSave();
             try {
                 const val = await api.validarAvaliacao(avalId);
                 if (!val.completo) {
-                    let msg = "A avaliação tem " + val.pendentes.length + " indicadores obrigatórios por responder:\\n\\n";
-                    val.pendentes.forEach(p => msg += "• " + p.codigo + " - " + p.pergunta + "\\n");
-                    alert("⚠️ Avaliação Incompleta!\\n\\n" + msg);
+                    let msg = "A avaliação tem " + val.pendentes.length + " indicadores obrigatórios por responder:\n\n";
+                    val.pendentes.forEach(p => msg += "• " + p.codigo + " - " + p.pergunta + "\n");
+                    alert("⚠️ Avaliação Incompleta!\n\n" + msg);
                     return;
                 }
-            } catch(e) {
-                console.error("Erro ao validar:", e);
-            }
+            } catch(e) { console.error("Erro ao validar:", e); }
 
-            if (!confirm('Finalizar a avaliação? Após finalizar, os resultados serão calculados.')) return;
+            if (!confirm('Finalizar a avaliação? Após finalizar, os resultados serão calculados e a IA gerará o seu relatório personalizado.')) return;
             try {
                 const res = await api.finalizarAvaliacao(avalId);
-                showToast('Avaliação finalizada com sucesso!', 'success');
-                setTimeout(() => window.location.href = `/pages/resultados.html?id=${avalId}`, 1000);
+                showToast('Avaliação finalizada com sucesso! A gerar relatório...', 'success');
+                setTimeout(() => window.location.href = `/pages/resultados.html?id=${avalId}`, 1500);
             } catch(e) { showToast(e.error || 'Erro ao finalizar', 'error'); }
         }
 
@@ -214,7 +1024,7 @@
                 msgs.innerHTML += `<div class="chat-msg assistant">${res.resposta.replace(/\n/g, '<br>')}</div>`;
             } catch(e) {
                 document.getElementById('chat-loading').remove();
-                msgs.innerHTML += `<div class="chat-msg assistant">Desculpe, ocorreu um erro. Tente novamente.</div>`;
+                msgs.innerHTML += `<div class="chat-msg assistant" style="color:var(--danger);">Erro: ${e.error || 'Falha na comunicação com a IA'}</div>`;
             }
             msgs.scrollTop = msgs.scrollHeight;
         }

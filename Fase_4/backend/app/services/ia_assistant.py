@@ -154,8 +154,7 @@ def get_gemini_response(mensagem, avaliacao_id, camada_id=None, user=None):
         except Exception as e:
             resposta_texto = f"Peço desculpa, ocorreu um erro na comunicação com o assistente IA. Por favor, tente novamente. (Erro: {str(e)[:100]})"
     else:
-        # Fallback sem API key
-        resposta_texto = _fallback_response(mensagem, camada_id)
+        raise ValueError('API Gemini não configurada. Configure a sua chave API nas Configurações.')
 
     # Guardar resposta
     msg_assistant = ConversaIA(avaliacao_id=avaliacao_id, papel='assistant', mensagem=resposta_texto, camada_id=camada_id)
@@ -165,16 +164,110 @@ def get_gemini_response(mensagem, avaliacao_id, camada_id=None, user=None):
     return resposta_texto
 
 
-def _fallback_response(mensagem, camada_id=None):
-    """Resposta básica quando não há API key configurada."""
-    camada_nome = ""
-    if camada_id:
-        camada = CamadaAilo.query.get(camada_id)
-        camada_nome = camada.nome if camada else ""
 
-    return (f"🤖 Assistente AILO (modo offline)\n\n"
-            f"Estou a funcionar sem ligação ao modelo de IA. "
-            f"Para ativar o assistente completo, configure a sua chave Gemini API "
-            f"na página de Configurações (⚙️ no menu).\n\n"
-            f"{'Está na camada: ' + camada_nome + '. ' if camada_nome else ''}"
-            f"Consulte a documentação do framework AILO para obter explicações detalhadas sobre cada indicador.")
+def get_report_chat_response(mensagem, avaliacao_id, user=None):
+    """Chat sobre o relatório com contexto completo dos resultados."""
+    import json
+    from app.models.resultado import ResultadoCamada, Interdependencia
+    from app.models.conversa import Relatorio
+    from app.services.knowledge_base import build_system_prompt
+    
+    # Determine API config
+    api_key = ''
+    model_name = 'gemini-3.5-flash'
+    if user:
+        if user.gemini_api_key:
+            api_key = user.gemini_api_key
+        if user.gemini_model and user.gemini_model in MODELOS_PERMITIDOS:
+            model_name = user.gemini_model
+    if not api_key:
+        api_key = current_app.config.get('GEMINI_API_KEY', '')
+    if not api_key:
+        raise ValueError('API Gemini não configurada. Configure a sua chave API nas Configurações.')
+    
+    avaliacao = Avaliacao.query.get(avaliacao_id)
+    if not avaliacao:
+        raise ValueError('Avaliação não encontrada')
+    
+    org = avaliacao.organizacao
+    resultados = ResultadoCamada.query.filter_by(avaliacao_id=avaliacao_id).all()
+    interdeps = Interdependencia.query.filter_by(avaliacao_id=avaliacao_id).all()
+    respostas = Resposta.query.filter_by(avaliacao_id=avaliacao_id).all()
+    relatorio = Relatorio.query.filter_by(avaliacao_id=avaliacao_id).first()
+    
+    # Build comprehensive report context
+    report_context = f"""=== CONTEXTO DO RELATÓRIO ===
+Organização: {org.nome}
+Setor: {org.setor} | Dimensão: {org.dimensao} | Tipo: {org.tipo}
+Score Global: {avaliacao.score_global}/5.0
+Nível Global: {avaliacao.nivel_global}
+
+--- Resultados por Camada ---"""
+    
+    for r in sorted(resultados, key=lambda x: x.camada.ordem if x.camada else 0):
+        pf = json.loads(r.pontos_fortes) if r.pontos_fortes else []
+        lac = json.loads(r.lacunas) if r.lacunas else []
+        rec = json.loads(r.recomendacoes) if r.recomendacoes else []
+        report_context += f"""\n
+{r.camada.nome if r.camada else '?'}: Score {r.score}/5 — {r.nivel}
+  Pontos Fortes: {', '.join(pf) if pf else 'Nenhum'}
+  Lacunas: {', '.join(lac) if lac else 'Nenhuma'}
+  Recomendações: {', '.join(rec) if rec else 'Nenhuma'}"""
+    
+    report_context += "\n\n--- Respostas Detalhadas ---"
+    for r in respostas:
+        if r.indicador:
+            report_context += f"\n{r.indicador.codigo}: {r.score}/5"
+            if r.justificacao:
+                report_context += f" — {r.justificacao[:100]}"
+    
+    report_context += "\n\n--- Interdependências ---"
+    for i in interdeps:
+        ca = i.camada_a.nome if i.camada_a else '?'
+        cb = i.camada_b.nome if i.camada_b else '?'
+        report_context += f"\n{ca} × {cb}: {i.tipo_relacao} — {i.impacto}"
+    
+    # Build system prompt with report context
+    user_memory = _get_user_memory(user)
+    system_prompt = build_system_prompt(report_context, '', user_memory)
+    system_prompt += "\n\nEstás no modo CHAT DO RELATÓRIO. O utilizador está a consultar os resultados da sua avaliação AILO. Tens acesso a TODOS os dados do relatório acima. Responde de forma clara, concreta e com dados específicos. Quando possível, cita scores e indicadores concretos."
+    
+    # Chat history (report-specific, tagged with camada_id=None and papel context)
+    historico = ConversaIA.query.filter_by(
+        avaliacao_id=avaliacao_id
+    ).filter(
+        ConversaIA.camada_id.is_(None)
+    ).order_by(ConversaIA.created_at.desc()).limit(10).all()
+    historico.reverse()
+    
+    # Save user message
+    msg_user = ConversaIA(avaliacao_id=avaliacao_id, papel='user', mensagem=mensagem, camada_id=None)
+    db.session.add(msg_user)
+    
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(model_name, system_instruction=system_prompt)
+        
+        chat_history = []
+        for h in historico:
+            role = 'user' if h.papel == 'user' else 'model'
+            chat_history.append({'role': role, 'parts': [h.mensagem]})
+        
+        chat = model.start_chat(history=chat_history)
+        response = chat.send_message(mensagem)
+        resposta_texto = response.text
+        
+        # Update user memory
+        org_nome = org.nome if org else ''
+        _update_user_memory(user, mensagem, resposta_texto, org_nome)
+        
+    except Exception as e:
+        resposta_texto = f'Erro na comunicação com o assistente: {str(e)[:100]}'
+    
+    # Save response
+    msg_assistant = ConversaIA(avaliacao_id=avaliacao_id, papel='assistant', mensagem=resposta_texto, camada_id=None)
+    db.session.add(msg_assistant)
+    db.session.commit()
+    
+    return resposta_texto

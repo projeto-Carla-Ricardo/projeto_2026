@@ -37,6 +37,8 @@ def create_app(config_name='default'):
     from app.routes.benchmarking import bench_bp
     from app.routes.analytics import analytics_bp
     from app.routes.export import export_bp
+    from app.routes.dynamic_questions import dynamic_bp
+    from app.routes.report_chat import report_chat_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
     app.register_blueprint(org_bp, url_prefix='/api/v1/organizacoes')
@@ -51,6 +53,8 @@ def create_app(config_name='default'):
     app.register_blueprint(bench_bp, url_prefix='/api/v1/benchmarking')
     app.register_blueprint(analytics_bp, url_prefix='/api/v1/analytics')
     app.register_blueprint(export_bp, url_prefix='/api/v1/export')
+    app.register_blueprint(dynamic_bp, url_prefix='/api/v1/avaliacoes')
+    app.register_blueprint(report_chat_bp, url_prefix='/api/v1')
 
     # Error handlers
     @app.errorhandler(404)

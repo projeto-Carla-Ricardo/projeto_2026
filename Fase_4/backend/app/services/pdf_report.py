@@ -95,6 +95,20 @@ def gerar_relatorio_pdf(avaliacao, resultados, interdependencias):
     ]))
     story.append(Spacer(1, 0.5*cm))
     story.append(t2)
+
+    # --- NÍVEL DE MATURIDADE ---
+    story.append(Spacer(1, 0.5*cm))
+    story.append(Paragraph("Nível de Maturidade AILO", h2))
+    
+    niveis_desc = {
+        'Inicial': 'A organização está nos estágios iniciais de adoção de IA e práticas de aprendizagem organizacional.',
+        'Em Desenvolvimento': 'Existem iniciativas isoladas mas falta integração sistémica entre as camadas.',
+        'Definido': 'A organização tem processos definidos mas a implementação é inconsistente.',
+        'Gerido': 'A organização gere ativamente a integração de IA e aprendizagem organizacional.',
+        'Otimizado': 'A organização está num nível de excelência com melhoria contínua integrada.'
+    }
+    desc = niveis_desc.get(avaliacao.nivel_global, '')
+    story.append(Paragraph(f"<b>{avaliacao.nivel_global}</b> — {desc}", body))
     story.append(PageBreak())
 
     # --- DIAGNÓSTICO POR CAMADA ---
@@ -122,6 +136,27 @@ def gerar_relatorio_pdf(avaliacao, resultados, interdependencias):
                 story.append(Paragraph(f"→ {rr}", bullet))
         story.append(Spacer(1, 0.3*cm))
 
+    # --- PONTOS CRÍTICOS ---
+    from app.models.resposta import Resposta as RespModel
+    respostas_all = RespModel.query.filter_by(avaliacao_id=avaliacao.id).all()
+    criticos = [(r.indicador.codigo, r.indicador.pergunta[:80], r.score, 
+                 r.indicador.componente.camada.nome if r.indicador and r.indicador.componente else '?') 
+                for r in respostas_all if r.score <= 2 and r.indicador]
+    criticos.sort(key=lambda x: x[2])
+    
+    if criticos:
+        story.append(Paragraph("2.5. Pontos Críticos", h1))
+        crit_data = [["Indicador", "Pergunta", "Score", "Camada"]]
+        for cod, perg, score, cam in criticos[:8]:
+            crit_data.append([cod, perg, f"{score}/5", cam])
+        tc = Table(crit_data, colWidths=[2.5*cm, 6.5*cm, 2*cm, 3*cm])
+        tc.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#E74C3C')), ('TEXTCOLOR', (0, 0), (-1, 0), WHITE),
+            ('FONTSIZE', (0, 0), (-1, -1), 9), ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, GRAY),
+            ('TOPPADDING', (0, 0), (-1, -1), 3), ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        story.append(tc)
     story.append(PageBreak())
 
     # --- INTERDEPENDÊNCIAS ---
